@@ -1,0 +1,2 @@
+# sichuan-mahjong-
+sichuan-mahjong
