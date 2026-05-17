@@ -1,0 +1,5250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>川蜀麻将 · 血战到底</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================
+   川蜀麻将 - Modern Sichuan Teahouse Aesthetic
+   ============================================ */
+
+:root {
+  /* Core palette - deep felt green, warm wood, ivory tile, vermillion accent */
+  --felt: #1a4d3a;
+  --felt-deep: #0f3025;
+  --felt-light: #2a6b50;
+  --wood: #8b5a2b;
+  --wood-dark: #5c3a1a;
+  --wood-light: #c8956d;
+  --ivory: #f4ead5;
+  --ivory-warm: #ede0c4;
+  --tile-face: #faf5e6;
+  --tile-shadow: #c4b896;
+  --vermillion: #c8302b;
+  --vermillion-deep: #8b1d1a;
+  --jade: #2d8659;
+  --ink: #1a1410;
+  --ink-soft: #3d3530;
+  --gold: #c9a55c;
+  --gold-bright: #e4c47a;
+  --paper: #e8dfc8;
+
+  /* Suit colors */
+  --suit-m: #c8302b;
+  --suit-s: #2d8659;
+  --suit-p: #2c5282;
+
+  /* Typography */
+  --font-display: 'Noto Serif SC', 'Songti SC', serif;
+  --font-body: 'Noto Sans SC', sans-serif;
+  --font-accent: 'Cinzel', serif;
+
+  /* Sizing - bigger tiles on desktop */
+  --tile-w: 50px;
+  --tile-h: 68px;
+  --tile-w-small: 30px;
+  --tile-h-small: 42px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font-body);
+  background: var(--ink);
+  color: var(--ivory);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ============================================
+   Screens & transitions
+   ============================================ */
+.screen {
+  position: fixed;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+}
+.screen.active {
+  display: flex;
+}
+
+/* ============================================
+   MAIN MENU
+   ============================================ */
+#main-menu {
+  background:
+    radial-gradient(ellipse at top, rgba(200, 165, 92, 0.15), transparent 60%),
+    radial-gradient(ellipse at bottom, rgba(200, 48, 43, 0.1), transparent 60%),
+    linear-gradient(180deg, #1a1410 0%, #0f0a05 100%);
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.menu-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(45deg, transparent 0, transparent 20px, rgba(200, 165, 92, 0.02) 20px, rgba(200, 165, 92, 0.02) 21px),
+    repeating-linear-gradient(-45deg, transparent 0, transparent 20px, rgba(200, 165, 92, 0.02) 20px, rgba(200, 165, 92, 0.02) 21px);
+  pointer-events: none;
+}
+
+.menu-ornament {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border: 2px solid var(--gold);
+  opacity: 0.4;
+  pointer-events: none;
+}
+.menu-ornament::before, .menu-ornament::after {
+  content: '';
+  position: absolute;
+  background: var(--gold);
+}
+.menu-ornament.top-left { top: 24px; left: 24px; border-right: none; border-bottom: none; }
+.menu-ornament.top-right { top: 24px; right: 24px; border-left: none; border-bottom: none; }
+.menu-ornament.bottom-left { bottom: 24px; left: 24px; border-right: none; border-top: none; }
+.menu-ornament.bottom-right { bottom: 24px; right: 24px; border-left: none; border-top: none; }
+
+.menu-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+  animation: fadeUp 1s ease;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.logo-block {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logo-seal {
+  width: 88px;
+  height: 88px;
+  background: linear-gradient(135deg, var(--vermillion) 0%, var(--vermillion-deep) 100%);
+  border: 3px solid var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 52px;
+  font-weight: 900;
+  color: var(--ivory);
+  margin-bottom: 24px;
+  box-shadow: 0 0 0 1px var(--ink), 0 8px 32px rgba(200, 48, 43, 0.4);
+  position: relative;
+  transform: rotate(-3deg);
+}
+.logo-seal::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 56px;
+  font-weight: 900;
+  letter-spacing: 8px;
+  color: var(--ivory);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--gold-bright);
+  letter-spacing: 6px;
+  margin-bottom: 6px;
+}
+
+.tagline {
+  font-family: var(--font-accent);
+  font-size: 11px;
+  color: var(--gold);
+  letter-spacing: 4px;
+  opacity: 0.7;
+}
+
+.menu-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 280px;
+}
+
+.btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 24px;
+  background: linear-gradient(180deg, rgba(244, 234, 213, 0.05) 0%, rgba(244, 234, 213, 0.02) 100%);
+  border: 1px solid rgba(200, 165, 92, 0.4);
+  color: var(--ivory);
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(200, 165, 92, 0.1) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.btn:hover::before, .btn:active::before {
+  opacity: 1;
+}
+
+.btn:hover {
+  border-color: var(--gold);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(200, 165, 92, 0.2);
+}
+
+.btn-primary {
+  background: linear-gradient(180deg, var(--vermillion) 0%, var(--vermillion-deep) 100%);
+  border-color: var(--gold);
+}
+.btn-primary:hover {
+  background: linear-gradient(180deg, #d83a35 0%, var(--vermillion) 100%);
+}
+
+.btn-secondary {
+  background: linear-gradient(180deg, rgba(139, 90, 43, 0.4) 0%, rgba(92, 58, 26, 0.4) 100%);
+}
+
+.btn-tertiary {
+  border-style: dashed;
+  opacity: 0.6;
+}
+
+.btn.disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+.btn.disabled:hover {
+  transform: none;
+  border-color: rgba(200, 165, 92, 0.4);
+  box-shadow: none;
+}
+
+.btn-label {
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 3px;
+}
+.btn-en {
+  font-family: var(--font-accent);
+  font-size: 9px;
+  letter-spacing: 3px;
+  opacity: 0.7;
+  margin-top: 2px;
+}
+
+.menu-footer {
+  position: absolute;
+  bottom: 60px;
+  font-family: var(--font-accent);
+  font-size: 10px;
+  letter-spacing: 2px;
+  opacity: 0.4;
+}
+
+/* ============================================
+   MODAL
+   ============================================ */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+.modal.active {
+  display: flex;
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-content {
+  background: linear-gradient(180deg, #2a1f15 0%, #1a1410 100%);
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  padding: 32px;
+  max-width: 480px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(200, 165, 92, 0.2);
+}
+.modal-content::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(200, 165, 92, 0.2);
+  pointer-events: none;
+}
+
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gold-bright);
+  letter-spacing: 4px;
+  text-align: center;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(200, 165, 92, 0.2);
+}
+
+.difficulty-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.diff-btn {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  background: rgba(244, 234, 213, 0.04);
+  border: 1px solid rgba(200, 165, 92, 0.3);
+  color: var(--ivory);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+.diff-btn:hover {
+  background: rgba(200, 165, 92, 0.08);
+  border-color: var(--gold);
+}
+
+.diff-rank {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gold-bright);
+  padding: 4px 10px;
+  border: 1px solid var(--gold);
+  letter-spacing: 2px;
+  min-width: 60px;
+  text-align: center;
+}
+
+.diff-name {
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  flex: 1;
+}
+.diff-desc {
+  font-size: 11px;
+  opacity: 0.6;
+  letter-spacing: 1px;
+}
+
+.modal-close {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: 1px solid rgba(200, 165, 92, 0.4);
+  color: var(--ivory);
+  cursor: pointer;
+  font-family: var(--font-body);
+  letter-spacing: 4px;
+  transition: all 0.2s ease;
+}
+.modal-close:hover {
+  background: rgba(200, 165, 92, 0.1);
+  border-color: var(--gold);
+}
+
+.rules-content { max-width: 520px; }
+.rules-scroll {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 0 4px 12px 4px;
+  margin-bottom: 16px;
+}
+.rules-scroll section {
+  margin-bottom: 18px;
+}
+.rules-scroll h3 {
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: var(--gold-bright);
+  letter-spacing: 3px;
+  margin-bottom: 8px;
+  padding-left: 10px;
+  border-left: 3px solid var(--vermillion);
+}
+.rules-scroll p {
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--ivory-warm);
+  opacity: 0.85;
+}
+.rules-scroll strong {
+  color: var(--gold-bright);
+  font-weight: 700;
+}
+
+/* ============================================
+   GAME SCREEN
+   ============================================ */
+#game-screen {
+  background:
+    radial-gradient(ellipse at center, var(--felt-light) 0%, var(--felt) 50%, var(--felt-deep) 100%);
+  position: relative;
+}
+
+.game-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 50% 50%, transparent 30%, rgba(0, 0, 0, 0.3) 100%),
+    repeating-linear-gradient(0deg, transparent 0, transparent 40px, rgba(0, 0, 0, 0.04) 40px, rgba(0, 0, 0, 0.04) 41px),
+    repeating-linear-gradient(90deg, transparent 0, transparent 40px, rgba(0, 0, 0, 0.04) 40px, rgba(0, 0, 0, 0.04) 41px);
+  pointer-events: none;
+}
+
+/* Top bar */
+.top-bar {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(200, 165, 92, 0.2);
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  background: rgba(244, 234, 213, 0.08);
+  border: 1px solid rgba(200, 165, 92, 0.3);
+  color: var(--ivory);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.icon-btn:hover {
+  background: rgba(200, 165, 92, 0.15);
+  border-color: var(--gold);
+}
+
+.game-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+.info-label { opacity: 0.6; font-size: 11px; }
+.info-value { color: var(--gold-bright); font-weight: 700; font-family: var(--font-display); }
+.info-divider { opacity: 0.4; }
+
+/* ============================================
+   TABLE & SEATS - Using flexbox layout
+   ============================================ */
+#game-screen {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.table {
+  flex: 1;
+  position: relative;
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr) 120px;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 8px;
+  padding: 8px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  min-height: 0;
+}
+
+.player {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+}
+
+.player-top {
+  grid-column: 2;
+  grid-row: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.player-bottom {
+  grid-column: 2;
+  grid-row: 3;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  min-height: 0;
+}
+.player-bottom .hand-bottom {
+  background: rgba(0, 0, 0, 0.3);
+  border-top: 1px solid rgba(200, 165, 92, 0.4);
+  border-bottom: 1px solid rgba(200, 165, 92, 0.4);
+  width: 100%;
+  padding: 12px 8px;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.3);
+}
+.player-left {
+  grid-column: 1;
+  grid-row: 2;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.player-right {
+  grid-column: 3;
+  grid-row: 2;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Player info */
+.player-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(200, 165, 92, 0.4);
+  padding: 8px 14px;
+  min-width: 180px;
+}
+.player-info-self {
+  margin-top: 8px;
+}
+.player-info-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(200, 165, 92, 0.3);
+  padding: 8px 6px;
+  width: 60px;
+}
+
+.player-avatar {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, var(--wood) 0%, var(--wood-dark) 100%);
+  border: 1px solid var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--ivory);
+  flex-shrink: 0;
+}
+.player-avatar.self {
+  background: linear-gradient(135deg, var(--vermillion) 0%, var(--vermillion-deep) 100%);
+}
+
+.player-meta {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+.player-name {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+.player-missing {
+  font-size: 10px;
+  color: var(--gold-bright);
+  letter-spacing: 1px;
+  min-height: 14px;
+}
+
+.player-score {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gold-bright);
+  min-width: 36px;
+  text-align: right;
+}
+
+/* Highlight current turn */
+.player.turn .player-info,
+.player.turn .player-info-side {
+  border-color: var(--gold-bright);
+  box-shadow: 0 0 16px rgba(228, 196, 122, 0.4);
+  animation: turnPulse 2s ease-in-out infinite;
+}
+@keyframes turnPulse {
+  0%, 100% { box-shadow: 0 0 16px rgba(228, 196, 122, 0.4); }
+  50% { box-shadow: 0 0 24px rgba(228, 196, 122, 0.7); }
+}
+
+.player.hu .player-info,
+.player.hu .player-info-side {
+  border-color: var(--vermillion);
+  background: linear-gradient(180deg, rgba(200, 48, 43, 0.25), rgba(0, 0, 0, 0.4));
+}
+
+/* ============================================
+   HANDS
+   ============================================ */
+.hand {
+  display: flex;
+  gap: 2px;
+  padding: 6px;
+  flex-wrap: nowrap;
+}
+.hand-bottom {
+  justify-content: center;
+  align-items: flex-end;
+  min-height: 80px;
+  gap: 4px;
+}
+.hand-bottom .tile {
+  width: 58px;
+  height: 80px;
+}
+.hand-bottom .tile .tile-num { font-size: 16px; }
+.hand-bottom .tile .tile-suit { font-size: 28px; }
+.hand-top {
+  justify-content: center;
+  align-items: flex-start;
+}
+.hand-left, .hand-right {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+/* ============================================
+   TILES
+   ============================================ */
+.tile {
+  width: var(--tile-w);
+  height: var(--tile-h);
+  background: linear-gradient(180deg, var(--tile-face) 0%, var(--ivory-warm) 100%);
+  border: 1px solid var(--tile-shadow);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow:
+    inset 0 -3px 0 var(--tile-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 2px 4px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  font-family: var(--font-display);
+  font-weight: 900;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.tile.clickable:hover {
+  transform: translateY(-6px);
+  box-shadow:
+    inset 0 -3px 0 var(--tile-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+.tile.selected {
+  transform: translateY(-10px);
+  box-shadow:
+    inset 0 -3px 0 var(--vermillion),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 10px 20px rgba(200, 48, 43, 0.5);
+}
+
+.tile.disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.4);
+}
+.tile.disabled:hover {
+  transform: none;
+}
+
+/* Missing-suit tiles - must be discarded first */
+.tile.must-discard {
+  box-shadow:
+    inset 0 -3px 0 var(--vermillion),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 0 12px rgba(200, 48, 43, 0.6),
+    0 2px 4px rgba(0, 0, 0, 0.3);
+  animation: mustDiscardPulse 1.5s ease-in-out infinite;
+}
+.tile.must-discard:hover {
+  transform: translateY(-6px);
+  box-shadow:
+    inset 0 -3px 0 var(--vermillion),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 0 20px rgba(200, 48, 43, 0.9),
+    0 8px 16px rgba(0, 0, 0, 0.4);
+}
+@keyframes mustDiscardPulse {
+  0%, 100% {
+    box-shadow:
+      inset 0 -3px 0 var(--vermillion),
+      inset 0 1px 0 rgba(255, 255, 255, 0.7),
+      0 0 8px rgba(200, 48, 43, 0.5),
+      0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  50% {
+    box-shadow:
+      inset 0 -3px 0 var(--vermillion),
+      inset 0 1px 0 rgba(255, 255, 255, 0.7),
+      0 0 18px rgba(200, 48, 43, 0.8),
+      0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Tile suits */
+.tile.suit-m { color: var(--suit-m); }
+.tile.suit-s { color: var(--suit-s); }
+.tile.suit-p { color: var(--suit-p); }
+
+.tile-num {
+  font-size: 14px;
+  line-height: 1;
+  margin-top: 4px;
+}
+.tile-suit {
+  font-size: 22px;
+  line-height: 1;
+}
+
+/* Tile face back (face-down for opponents) */
+.tile-back {
+  width: var(--tile-w-small);
+  height: var(--tile-h-small);
+  background:
+    linear-gradient(180deg, var(--wood-light) 0%, var(--wood) 50%, var(--wood-dark) 100%);
+  border: 1px solid var(--wood-dark);
+  border-radius: 3px;
+  box-shadow:
+    inset 0 -2px 0 var(--wood-dark),
+    inset 0 1px 0 rgba(255, 220, 180, 0.3),
+    0 1px 3px rgba(0, 0, 0, 0.4);
+  position: relative;
+  flex-shrink: 0;
+}
+.tile-back::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 1px;
+  background:
+    radial-gradient(circle at center, rgba(200, 165, 92, 0.3) 0%, transparent 70%);
+}
+
+/* Vertical tile back for left/right opponents */
+.hand-left .tile-back,
+.hand-right .tile-back {
+  width: var(--tile-h-small);
+  height: var(--tile-w-small);
+}
+
+/* Small tiles for opponent melds */
+.tile-small {
+  width: var(--tile-w-small);
+  height: var(--tile-h-small);
+  font-size: 0.7em;
+}
+.tile-small .tile-num { font-size: 10px; margin-top: 2px; }
+.tile-small .tile-suit { font-size: 14px; }
+
+/* Vertical tiles (for side players' melds) */
+.tile-vertical {
+  width: var(--tile-h-small);
+  height: var(--tile-w-small);
+  transform: none;
+}
+
+/* ============================================
+   MELDS (revealed sets - peng/gang)
+   ============================================ */
+.melds {
+  display: flex;
+  gap: 6px;
+  padding: 4px 8px;
+  min-height: 40px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.melds-bottom { justify-content: center; }
+.melds-top { justify-content: center; }
+.melds-left, .melds-right {
+  flex-direction: column;
+}
+
+.meld {
+  display: flex;
+  gap: 1px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 2px;
+  border-radius: 3px;
+}
+
+/* ============================================
+   DISCARDS - All shown in center, by direction
+   ============================================ */
+.discards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  align-content: flex-start;
+  justify-content: center;
+}
+
+/* Top player (北) discards - shown at top of center, fanning down */
+.discards-top {
+  max-width: 100%;
+  min-height: 60px;
+  padding: 4px 8px;
+  align-items: flex-start;
+}
+
+/* Bottom player (我/南) discards - shown at bottom of center, fanning up */
+.discards-bottom-center {
+  max-width: 100%;
+  min-height: 60px;
+  padding: 4px 8px;
+  align-items: flex-end;
+}
+
+/* Left player (西) discards - shown left of center, fanning right */
+.discards-left {
+  width: 110px;
+  min-height: 80px;
+  padding: 4px;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+/* Right player (东) discards - shown right of center, fanning left */
+.discards-right {
+  width: 110px;
+  min-height: 80px;
+  padding: 4px;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.discards .tile {
+  width: 28px;
+  height: 38px;
+  cursor: default;
+  box-shadow:
+    inset 0 -2px 0 var(--tile-shadow),
+    0 1px 2px rgba(0, 0, 0, 0.3);
+}
+.discards .tile .tile-num { font-size: 9px; margin-top: 1px; }
+.discards .tile .tile-suit { font-size: 14px; }
+
+.discards .tile.last-discard-hl {
+  outline: 2px solid var(--gold-bright);
+  outline-offset: 1px;
+  animation: lastDiscardPulse 0.6s ease;
+}
+@keyframes lastDiscardPulse {
+  0% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+/* ============================================
+   TABLE CENTER - holds all discards + wall info
+   ============================================ */
+.table-center {
+  grid-column: 2;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-between;
+  position: relative;
+  padding: 8px;
+  min-height: 0;
+  gap: 4px;
+}
+
+.discards-middle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+}
+
+.center-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.wall-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(200, 165, 92, 0.4);
+  padding: 8px 16px;
+  border-radius: 4px;
+}
+.wall-count {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--gold-bright);
+  line-height: 1;
+}
+.wall-label {
+  font-size: 10px;
+  letter-spacing: 4px;
+  opacity: 0.6;
+}
+
+.last-discard {
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.turn-indicator {
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 4px;
+  color: var(--gold-bright);
+  text-shadow: 0 0 8px rgba(228, 196, 122, 0.5);
+  min-height: 18px;
+}
+
+/* ============================================
+   ACTION BAR
+   ============================================ */
+.action-bar {
+  position: absolute;
+  bottom: 50%;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.action-btn {
+  pointer-events: auto;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 2px solid var(--gold);
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: var(--ivory);
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s ease;
+  animation: actionPop 0.3s ease;
+}
+.action-btn.visible {
+  display: flex;
+}
+.action-btn:hover {
+  transform: scale(1.08);
+}
+
+.action-pass {
+  background: linear-gradient(180deg, #555 0%, #333 100%);
+  border-color: #888;
+}
+.action-peng {
+  background: linear-gradient(180deg, var(--jade) 0%, #1a5c3c 100%);
+}
+.action-gang {
+  background: linear-gradient(180deg, var(--wood-light) 0%, var(--wood-dark) 100%);
+}
+.action-hu {
+  background: linear-gradient(180deg, var(--vermillion) 0%, var(--vermillion-deep) 100%);
+  animation: huPulse 0.8s ease infinite, actionPop 0.3s ease;
+}
+@keyframes huPulse {
+  0%, 100% { box-shadow: 0 4px 12px rgba(200, 48, 43, 0.6), 0 0 0 0 rgba(200, 48, 43, 0.6); }
+  50% { box-shadow: 0 4px 12px rgba(200, 48, 43, 0.8), 0 0 0 12px rgba(200, 48, 43, 0); }
+}
+@keyframes actionPop {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* ============================================
+   OVERLAY (missing suit selection)
+   ============================================ */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  padding: 20px;
+}
+.overlay.active {
+  display: flex;
+  animation: fadeIn 0.3s ease;
+}
+
+.overlay-content {
+  background: linear-gradient(180deg, #2a1f15 0%, #1a1410 100%);
+  border: 1px solid var(--gold);
+  padding: 32px 24px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+}
+.overlay-content::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(200, 165, 92, 0.2);
+  pointer-events: none;
+}
+
+.overlay-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gold-bright);
+  letter-spacing: 6px;
+  margin-bottom: 8px;
+}
+.overlay-subtitle {
+  font-size: 12px;
+  opacity: 0.7;
+  letter-spacing: 2px;
+  margin-bottom: 24px;
+}
+
+.missing-options {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.missing-option {
+  background: rgba(244, 234, 213, 0.04);
+  border: 1px solid rgba(200, 165, 92, 0.3);
+  padding: 16px 12px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.missing-option:hover {
+  background: rgba(200, 165, 92, 0.1);
+  border-color: var(--gold);
+  transform: translateY(-2px);
+}
+
+.missing-tile-preview {
+  width: 56px;
+  height: 76px;
+  background: linear-gradient(180deg, var(--tile-face) 0%, var(--ivory-warm) 100%);
+  border: 1px solid var(--tile-shadow);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 900;
+  box-shadow: inset 0 -3px 0 var(--tile-shadow);
+}
+.missing-tile-preview.suit-m { color: var(--suit-m); }
+.missing-tile-preview.suit-s { color: var(--suit-s); }
+.missing-tile-preview.suit-p { color: var(--suit-p); }
+
+.missing-label {
+  color: var(--ivory);
+  font-size: 13px;
+  letter-spacing: 3px;
+}
+
+.suggest-btn {
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--gold-bright);
+  padding: 8px 24px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  letter-spacing: 2px;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+.suggest-btn:hover {
+  background: rgba(200, 165, 92, 0.1);
+}
+
+/* ============================================
+   RESULT MODAL
+   ============================================ */
+.result-content {
+  max-width: 520px;
+}
+
+.result-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.result-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: rgba(244, 234, 213, 0.04);
+  border: 1px solid rgba(200, 165, 92, 0.2);
+  border-left: 3px solid var(--gold);
+}
+.result-row.winner {
+  border-left-color: var(--vermillion);
+  background: linear-gradient(90deg, rgba(200, 48, 43, 0.15), rgba(244, 234, 213, 0.04));
+}
+.result-row.loser {
+  opacity: 0.7;
+}
+
+.result-name {
+  font-size: 14px;
+  letter-spacing: 2px;
+  min-width: 50px;
+}
+.result-types {
+  flex: 1;
+  font-size: 11px;
+  opacity: 0.8;
+  letter-spacing: 1px;
+}
+.result-score {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  min-width: 60px;
+  text-align: right;
+}
+.result-score.positive { color: #6cd99f; }
+.result-score.negative { color: #ff6b6b; }
+
+.result-actions {
+  display: flex;
+  gap: 10px;
+}
+.result-actions .btn { flex: 1; }
+
+.pause-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ============================================
+   HINT / TOAST
+   ============================================ */
+.hint {
+  position: absolute;
+  bottom: 220px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid var(--gold);
+  padding: 8px 16px;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--gold-bright);
+  display: none;
+  z-index: 30;
+  white-space: nowrap;
+}
+.hint.visible {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
+#toast {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 2000;
+  pointer-events: none;
+}
+.toast-item {
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid var(--gold);
+  color: var(--ivory);
+  padding: 10px 20px;
+  font-size: 13px;
+  letter-spacing: 2px;
+  animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+.toast-item.success { border-color: var(--jade); color: #8ee7b5; }
+.toast-item.warning { border-color: var(--gold-bright); }
+.toast-item.error { border-color: var(--vermillion); color: #ff8d8a; }
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes toastOut {
+  to { opacity: 0; transform: translateY(-20px); }
+}
+
+/* Action animation when player calls peng/gang/hu */
+.action-popup {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-display);
+  font-size: 80px;
+  font-weight: 900;
+  color: var(--vermillion);
+  text-shadow:
+    0 0 20px var(--vermillion),
+    2px 2px 0 var(--gold),
+    -2px -2px 0 var(--gold);
+  pointer-events: none;
+  z-index: 100;
+  animation: actionAnim 1.2s ease forwards;
+}
+@keyframes actionAnim {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3) rotate(-15deg); }
+  30% { opacity: 1; transform: translate(-50%, -50%) scale(1.2) rotate(5deg); }
+  70% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.4) rotate(0deg); }
+}
+
+/* ============================================
+   ONLINE LOBBY & ROOM WAITING
+   ============================================ */
+.online-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.form-label {
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: var(--gold-bright);
+  opacity: 0.8;
+  margin-top: 4px;
+}
+
+.form-input {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(200, 165, 92, 0.4);
+  color: var(--ivory);
+  padding: 12px 14px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  letter-spacing: 2px;
+  border-radius: 0;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+.form-input:focus {
+  border-color: var(--gold-bright);
+  background: rgba(0, 0, 0, 0.55);
+}
+.form-input::placeholder {
+  color: rgba(244, 234, 213, 0.3);
+}
+
+.form-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0 4px;
+}
+.form-divider::before,
+.form-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(200, 165, 92, 0.3), transparent);
+}
+.form-divider span {
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--gold);
+  opacity: 0.8;
+  white-space: nowrap;
+}
+
+/* Room waiting */
+.room-waiting-content {
+  max-width: 480px;
+}
+
+.room-code-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: linear-gradient(180deg, rgba(200, 48, 43, 0.15) 0%, rgba(139, 29, 26, 0.05) 100%);
+  border: 1px solid var(--gold);
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.room-code-label {
+  font-size: 12px;
+  letter-spacing: 4px;
+  color: var(--gold-bright);
+  opacity: 0.8;
+}
+
+.room-code-value {
+  font-family: var(--font-display);
+  font-size: 38px;
+  font-weight: 900;
+  letter-spacing: 8px;
+  color: var(--ivory);
+  text-shadow: 0 0 12px rgba(228, 196, 122, 0.4);
+}
+
+.copy-btn {
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--gold-bright);
+  padding: 6px 14px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 11px;
+  letter-spacing: 2px;
+  transition: all 0.2s ease;
+}
+.copy-btn:hover {
+  background: rgba(200, 165, 92, 0.15);
+}
+
+.room-hint {
+  font-size: 12px;
+  color: var(--ivory-warm);
+  opacity: 0.65;
+  text-align: center;
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.room-player-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.room-seat {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  background: rgba(244, 234, 213, 0.04);
+  border: 1px solid rgba(200, 165, 92, 0.2);
+  transition: all 0.2s ease;
+}
+.room-seat.filled {
+  border-color: rgba(200, 165, 92, 0.5);
+}
+.room-seat.me {
+  background: rgba(200, 48, 43, 0.1);
+  border-color: var(--vermillion);
+}
+
+.seat-mark {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, var(--wood) 0%, var(--wood-dark) 100%);
+  border: 1px solid var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--ivory);
+  flex-shrink: 0;
+}
+.room-seat.me .seat-mark {
+  background: linear-gradient(135deg, var(--vermillion) 0%, var(--vermillion-deep) 100%);
+}
+.seat-mark.empty {
+  background: rgba(244, 234, 213, 0.04);
+  border-style: dashed;
+  opacity: 0.5;
+}
+
+.seat-name {
+  flex: 1;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+.seat-name.empty {
+  opacity: 0.4;
+  font-style: italic;
+}
+
+.seat-status {
+  font-size: 11px;
+  letter-spacing: 2px;
+  padding: 4px 10px;
+  border: 1px solid currentColor;
+  opacity: 0.7;
+}
+.seat-status.online {
+  color: #6cd99f;
+}
+.seat-status.offline {
+  color: #ff8d8a;
+}
+
+.room-controls {
+  margin-bottom: 12px;
+}
+.room-controls .btn {
+  width: 100%;
+}
+
+.waiting-text {
+  text-align: center;
+  color: var(--gold-bright);
+  opacity: 0.7;
+  letter-spacing: 3px;
+  font-size: 13px;
+  padding: 12px;
+  animation: waitingPulse 2s ease-in-out infinite;
+}
+@keyframes waitingPulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.9; }
+}
+
+/* Connection status indicator */
+.conn-status {
+  position: fixed;
+  top: 16px;
+  right: 64px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--jade);
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--ivory);
+  z-index: 100;
+  display: none;
+}
+.conn-status.visible { display: flex; }
+.conn-status.disconnected { border-color: var(--vermillion); }
+.conn-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #6cd99f;
+}
+.conn-status.disconnected .conn-status-dot { background: var(--vermillion); animation: blink 1s ease-in-out infinite; }
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Player offline overlay - dim avatar when player is offline */
+.player.offline .player-info,
+.player.offline .player-info-side {
+  opacity: 0.5;
+  filter: grayscale(0.6);
+}
+.player.offline .player-avatar::after {
+  content: '离线';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.85);
+  font-size: 8px;
+  padding: 1px 4px;
+  border: 1px solid var(--vermillion);
+  color: var(--vermillion);
+  white-space: nowrap;
+}
+.player.offline .player-avatar {
+  position: relative;
+}
+
+/* ============================================
+   RESPONSIVE - Mobile portrait
+   ============================================ */
+@media (max-width: 600px) {
+  :root {
+    --tile-w: 32px;
+    --tile-h: 44px;
+    --tile-w-small: 22px;
+    --tile-h-small: 30px;
+  }
+
+  .title { font-size: 42px; letter-spacing: 6px; }
+  .logo-seal { width: 72px; height: 72px; font-size: 42px; }
+
+  .table {
+    grid-template-columns: 76px 1fr 76px;
+    grid-template-rows: auto 1fr auto;
+    gap: 4px;
+    padding: 4px;
+  }
+
+  .player-info { min-width: 130px; padding: 4px 8px; }
+  .player-avatar { width: 28px; height: 28px; font-size: 14px; }
+  .player-name { font-size: 11px; }
+  .player-score { font-size: 14px; }
+
+  .player-info-side { width: 50px; padding: 6px 4px; }
+
+  .discards-left, .discards-right { width: 70px; }
+  .discards .tile { width: 22px; height: 30px; }
+  .discards .tile .tile-num { font-size: 7px; }
+  .discards .tile .tile-suit { font-size: 11px; }
+
+  .wall-count { font-size: 22px; }
+
+  .hand-bottom .tile { width: 38px; height: 52px; }
+  .hand-bottom .tile .tile-num { font-size: 11px; }
+  .hand-bottom .tile .tile-suit { font-size: 18px; }
+
+  .action-btn { width: 50px; height: 50px; font-size: 15px; }
+
+  .hint { bottom: 180px; font-size: 11px; }
+
+  .tile-num { font-size: 11px; }
+  .tile-suit { font-size: 18px; }
+
+  .melds { padding: 2px 4px; }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); }
+::-webkit-scrollbar-thumb { background: rgba(200, 165, 92, 0.4); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(200, 165, 92, 0.6); }
+</style></head><body>
+
+<!-- ============== MAIN MENU ============== -->
+<div id="main-menu" class="screen active">
+  <div class="menu-bg"></div>
+  <div class="menu-ornament top-left"></div>
+  <div class="menu-ornament top-right"></div>
+  <div class="menu-ornament bottom-left"></div>
+  <div class="menu-ornament bottom-right"></div>
+
+  <div class="menu-content">
+    <div class="logo-block">
+      <div class="logo-seal">川</div>
+      <h1 class="title">川蜀麻将</h1>
+      <p class="subtitle">— 血战到底 —</p>
+      <p class="tagline">SICHUAN · BLOOD BATTLE MAHJONG</p>
+    </div>
+
+    <div class="menu-buttons">
+      <button class="btn btn-primary" onclick="Game.startSinglePlayer('easy')">
+        <span class="btn-label">单机对战</span>
+        <span class="btn-en">SINGLE PLAYER</span>
+      </button>
+      <button class="btn btn-secondary" onclick="UI.showDifficulty()">
+        <span class="btn-label">难度选择</span>
+        <span class="btn-en">DIFFICULTY</span>
+      </button>
+      <button class="btn btn-secondary" onclick="UI.showRules()">
+        <span class="btn-label">规则说明</span>
+        <span class="btn-en">RULES</span>
+      </button>
+      <button class="btn btn-secondary" onclick="OnlineLobby.showEntry()">
+        <span class="btn-label">联机对战</span>
+        <span class="btn-en">MULTIPLAYER</span>
+      </button>
+    </div>
+
+    <div class="menu-footer">
+      <span>v0.1 · 原型版本</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============== DIFFICULTY MODAL ============== -->
+<div id="difficulty-modal" class="modal">
+  <div class="modal-content">
+    <h2 class="modal-title">选择 AI 难度</h2>
+    <div class="difficulty-options">
+      <button class="diff-btn" data-level="easy" onclick="Game.startSinglePlayer('easy')">
+        <span class="diff-rank">入门</span>
+        <span class="diff-name">新手茶客</span>
+        <span class="diff-desc">出牌随意，适合熟悉规则</span>
+      </button>
+      <button class="diff-btn" data-level="medium" onclick="Game.startSinglePlayer('medium')">
+        <span class="diff-rank">进阶</span>
+        <span class="diff-name">街坊老手</span>
+        <span class="diff-desc">懂得拆搭子，会算番</span>
+      </button>
+      <button class="diff-btn" data-level="hard" onclick="Game.startSinglePlayer('hard')">
+        <span class="diff-rank">大师</span>
+        <span class="diff-name">茶馆传奇</span>
+        <span class="diff-desc">记牌精准，策略老辣</span>
+      </button>
+    </div>
+    <button class="modal-close" onclick="UI.closeModal('difficulty-modal')">关闭</button>
+  </div>
+</div>
+
+<!-- ============== RULES MODAL ============== -->
+<div id="rules-modal" class="modal">
+  <div class="modal-content rules-content">
+    <h2 class="modal-title">四川麻将规则</h2>
+    <div class="rules-scroll">
+      <section>
+        <h3>牌面构成</h3>
+        <p>四川麻将仅使用万、条、筒三门花色，每门 1-9 各四张，共 108 张牌。不含字牌（东南西北中发白）和花牌。</p>
+      </section>
+      <section>
+        <h3>定缺</h3>
+        <p>开局发牌后，每位玩家必须从三门花色中选择一门作为"缺门"，整局不得碰、杠或胡该花色的牌。胡牌时手中必须没有缺门的牌。</p>
+      </section>
+      <section>
+        <h3>血战到底</h3>
+        <p>一家胡牌后游戏不结束，胡牌者退出本局但其余玩家继续，直到剩余一人或牌墙摸完。一局中可能有多人胡牌。</p>
+      </section>
+      <section>
+        <h3>胡牌牌型</h3>
+        <p>· <strong>平胡</strong>：4 副刻子/顺子 + 1 对将<br>
+        · <strong>对对胡</strong>：4 副刻子 + 1 对将（4 番）<br>
+        · <strong>清一色</strong>：全部由一门花色组成（4 番）<br>
+        · <strong>七对</strong>：14 张牌组成 7 对（4 番）<br>
+        · <strong>龙七对</strong>：七对中含 4 张相同牌（8 番）</p>
+      </section>
+      <section>
+        <h3>番数加成</h3>
+        <p>· <strong>根</strong>：胡牌时手中有 4 张相同的牌，每根加 1 番<br>
+        · <strong>杠</strong>：明杠 1 番，暗杠 2 番<br>
+        · <strong>自摸</strong>：自摸胡加 1 番<br>
+        · <strong>杠上花</strong>：开杠后摸牌即胡（2 番）</p>
+      </section>
+    </div>
+    <button class="modal-close" onclick="UI.closeModal('rules-modal')">明白了</button>
+  </div>
+</div>
+
+<!-- ============== GAME SCREEN ============== -->
+<div id="game-screen" class="screen">
+  <div class="game-bg"></div>
+
+  <!-- Connection status (only visible in online mode) -->
+  <div id="conn-status" class="conn-status">
+    <div class="conn-status-dot"></div>
+    <span id="conn-status-text">已连接</span>
+  </div>
+
+  <!-- Top bar -->
+  <div class="top-bar">
+    <button class="icon-btn" onclick="UI.showPauseMenu()">
+      <svg viewBox="0 0 24 24" width="20" height="20"><path d="M6 4h4v16H6zM14 4h4v16h-4z" fill="currentColor"/></svg>
+    </button>
+    <div class="game-info">
+      <span class="info-label">剩余</span>
+      <span id="tiles-remaining" class="info-value">--</span>
+      <span class="info-divider">·</span>
+      <span class="info-label">局数</span>
+      <span id="round-number" class="info-value">1</span>
+    </div>
+    <button class="icon-btn" onclick="UI.toggleSound()">
+      <svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z" fill="currentColor"/></svg>
+    </button>
+  </div>
+
+  <!-- The mahjong table -->
+  <div class="table">
+
+    <!-- Top opponent -->
+    <div class="player player-top" id="player-2">
+      <div class="player-info">
+        <div class="player-avatar">北</div>
+        <div class="player-meta">
+          <span class="player-name">老王</span>
+          <span class="player-missing" id="missing-2"></span>
+        </div>
+        <div class="player-score" id="score-2">0</div>
+      </div>
+      <div class="hand hand-top" id="hand-2"></div>
+      <div class="melds melds-top" id="melds-2"></div>
+    </div>
+
+    <!-- Left opponent -->
+    <div class="player player-left" id="player-3">
+      <div class="player-info-side">
+        <div class="player-avatar">西</div>
+        <div class="player-meta">
+          <span class="player-name">三姐</span>
+          <span class="player-missing" id="missing-3"></span>
+        </div>
+        <div class="player-score" id="score-3">0</div>
+      </div>
+      <div class="hand hand-left" id="hand-3"></div>
+      <div class="melds melds-left" id="melds-3"></div>
+    </div>
+
+    <!-- Right opponent -->
+    <div class="player player-right" id="player-1">
+      <div class="player-info-side">
+        <div class="player-avatar">东</div>
+        <div class="player-meta">
+          <span class="player-name">李叔</span>
+          <span class="player-missing" id="missing-1"></span>
+        </div>
+        <div class="player-score" id="score-1">0</div>
+      </div>
+      <div class="hand hand-right" id="hand-1"></div>
+      <div class="melds melds-right" id="melds-1"></div>
+    </div>
+
+    <!-- Center area -->
+    <div class="table-center">
+      <!-- Discards from all players, arranged around the center -->
+      <div class="discards discards-top" id="discards-2"></div>
+      <div class="discards-middle-row">
+        <div class="discards discards-left" id="discards-3"></div>
+        <div class="center-info">
+          <div class="wall-indicator">
+            <div class="wall-count" id="wall-count">108</div>
+            <div class="wall-label">牌墙</div>
+          </div>
+          <div class="turn-indicator" id="turn-indicator"></div>
+        </div>
+        <div class="discards discards-right" id="discards-1"></div>
+      </div>
+      <div class="discards discards-bottom-center" id="discards-0"></div>
+    </div>
+
+    <!-- Player (bottom) -->
+    <div class="player player-bottom" id="player-0">
+      <div class="melds melds-bottom" id="melds-0"></div>
+      <div class="hand hand-bottom" id="hand-0"></div>
+      <div class="player-info player-info-self">
+        <div class="player-avatar self">南</div>
+        <div class="player-meta">
+          <span class="player-name">我</span>
+          <span class="player-missing" id="missing-0"></span>
+        </div>
+        <div class="player-score" id="score-0">0</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Action buttons -->
+  <div class="action-bar" id="action-bar">
+    <button class="action-btn action-pass" id="btn-pass" onclick="Game.action('pass')">过</button>
+    <button class="action-btn action-peng" id="btn-peng" onclick="Game.action('peng')">碰</button>
+    <button class="action-btn action-gang" id="btn-gang" onclick="Game.action('gang')">杠</button>
+    <button class="action-btn action-hu" id="btn-hu" onclick="Game.action('hu')">胡</button>
+  </div>
+
+  <!-- Missing-suit selection overlay -->
+  <div id="missing-overlay" class="overlay">
+    <div class="overlay-content missing-content">
+      <h2 class="overlay-title">请选择缺一门</h2>
+      <p class="overlay-subtitle">整局中你将不能胡、碰、杠这门花色</p>
+      <div class="missing-options">
+        <button class="missing-option" data-suit="m" onclick="Game.chooseMissing('m')">
+          <div class="missing-tile-preview suit-m"><span>萬</span></div>
+          <span class="missing-label">缺萬</span>
+        </button>
+        <button class="missing-option" data-suit="s" onclick="Game.chooseMissing('s')">
+          <div class="missing-tile-preview suit-s"><span>條</span></div>
+          <span class="missing-label">缺條</span>
+        </button>
+        <button class="missing-option" data-suit="p" onclick="Game.chooseMissing('p')">
+          <div class="missing-tile-preview suit-p"><span>筒</span></div>
+          <span class="missing-label">缺筒</span>
+        </button>
+      </div>
+      <button class="suggest-btn" onclick="Game.suggestMissing()">智能推荐</button>
+    </div>
+  </div>
+
+  <!-- Action hint -->
+  <div class="hint" id="hint"></div>
+
+</div>
+
+<!-- ============== RESULT MODAL ============== -->
+<div id="result-modal" class="modal">
+  <div class="modal-content result-content">
+    <h2 class="modal-title" id="result-title">本局结算</h2>
+    <div class="result-list" id="result-list"></div>
+    <div class="result-actions">
+      <button class="btn btn-primary" onclick="Game.nextRound()">
+        <span class="btn-label">再来一局</span>
+      </button>
+      <button class="btn btn-secondary" onclick="UI.returnToMenu()">
+        <span class="btn-label">返回大厅</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============== PAUSE MENU ============== -->
+<div id="pause-modal" class="modal">
+  <div class="modal-content">
+    <h2 class="modal-title">暂停</h2>
+    <div class="pause-buttons">
+      <button class="btn btn-primary" onclick="UI.closeModal('pause-modal')">继续游戏</button>
+      <button class="btn btn-secondary" onclick="UI.showRules()">查看规则</button>
+      <button class="btn btn-tertiary" onclick="UI.returnToMenu()">返回大厅</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast notifications -->
+<div id="toast"></div>
+
+<!-- ============== ONLINE ENTRY (name + create/join) ============== -->
+<div id="online-entry" class="modal">
+  <div class="modal-content">
+    <h2 class="modal-title">联机对战</h2>
+    <div class="online-form">
+      <label class="form-label">昵称</label>
+      <input id="player-name-input" type="text" class="form-input" placeholder="输入你的昵称" maxlength="10">
+
+      <div class="form-divider"><span>新建房间</span></div>
+      <button class="btn btn-primary" onclick="OnlineLobby.createRoom()">
+        <span class="btn-label">创建房间</span>
+        <span class="btn-en">CREATE ROOM</span>
+      </button>
+
+      <div class="form-divider"><span>加入房间</span></div>
+      <label class="form-label">房间号</label>
+      <input id="room-code-input" type="text" class="form-input" placeholder="6 位数字" maxlength="6" pattern="\d{6}" inputmode="numeric">
+      <button class="btn btn-secondary" onclick="OnlineLobby.joinRoom()">
+        <span class="btn-label">加入房间</span>
+        <span class="btn-en">JOIN ROOM</span>
+      </button>
+    </div>
+    <button class="modal-close" onclick="OnlineLobby.hideEntry()">返回</button>
+  </div>
+</div>
+
+<!-- ============== ROOM WAITING (after creating/joining) ============== -->
+<div id="room-waiting" class="modal">
+  <div class="modal-content room-waiting-content">
+    <h2 class="modal-title">等待加入</h2>
+    <div class="room-code-banner">
+      <span class="room-code-label">房间号</span>
+      <span id="room-code-display" class="room-code-value">------</span>
+      <button class="copy-btn" onclick="OnlineLobby.copyRoomCode()">复制</button>
+    </div>
+    <p class="room-hint">将房间号告诉朋友，他们可以输入此号码加入。空位将由 AI 自动补满。</p>
+    <div id="room-player-list" class="room-player-list"></div>
+
+    <div id="host-controls" class="room-controls" style="display:none">
+      <button class="btn btn-primary" onclick="OnlineLobby.startGame()">
+        <span class="btn-label">开始游戏</span>
+      </button>
+    </div>
+    <div id="guest-controls" class="room-controls" style="display:none">
+      <p class="waiting-text">等待房主开始游戏...</p>
+    </div>
+    <button class="modal-close" onclick="OnlineLobby.leaveRoom()">离开房间</button>
+  </div>
+</div>
+
+<script>
+
+// ========== tiles.js ==========
+/* ============================================
+   TILES MODULE
+   Renders mahjong tiles with authentic visuals.
+   Tile encoding: {suit}{num} where suit is m/s/p and num is 1-9
+   Example: 'm1' = 1 man, 's5' = 5 sou, 'p9' = 9 pin
+   ============================================ */
+
+const Tiles = {
+
+  // Generate the full Sichuan deck (108 tiles: 27 distinct, 4 of each)
+  buildDeck() {
+    const suits = ['m', 's', 'p'];
+    const deck = [];
+    for (const suit of suits) {
+      for (let n = 1; n <= 9; n++) {
+        for (let i = 0; i < 4; i++) {
+          deck.push(suit + n);
+        }
+      }
+    }
+    return deck;
+  },
+
+  // Shuffle (Fisher-Yates)
+  shuffle(deck) {
+    const arr = deck.slice();
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  },
+
+  // Get suit and number from tile code
+  parse(tile) {
+    return { suit: tile[0], num: parseInt(tile.slice(1), 10) };
+  },
+
+  // Get the Chinese character representation
+  getDisplay(tile) {
+    const { suit, num } = this.parse(tile);
+    const numChars = ['', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
+    const suitChars = { m: '萬', s: '條', p: '筒' };
+    return {
+      num: num,
+      numChar: numChars[num],
+      suit: suitChars[suit],
+      suitClass: 'suit-' + suit,
+    };
+  },
+
+  // Get suit name in Chinese
+  getSuitName(suit) {
+    return { m: '萬', s: '條', p: '筒' }[suit];
+  },
+
+  // Sort hand - by suit then number
+  sortHand(hand) {
+    const suitOrder = { m: 0, s: 1, p: 2 };
+    return hand.slice().sort((a, b) => {
+      const pa = this.parse(a);
+      const pb = this.parse(b);
+      if (pa.suit !== pb.suit) return suitOrder[pa.suit] - suitOrder[pb.suit];
+      return pa.num - pb.num;
+    });
+  },
+
+  // Render a single tile as DOM element
+  renderTile(tile, options = {}) {
+    const { num, suit, suitClass } = this.getDisplay(tile);
+    const el = document.createElement('div');
+    el.className = 'tile ' + suitClass;
+    if (options.small) el.classList.add('tile-small');
+    if (options.disabled) el.classList.add('disabled');
+    if (options.selected) el.classList.add('selected');
+    if (options.clickable) el.classList.add('clickable');
+    el.dataset.tile = tile;
+
+    // Render the tile face with number on top and suit symbol below
+    el.innerHTML = `
+      <span class="tile-num">${num}</span>
+      <span class="tile-suit">${suit}</span>
+    `;
+
+    if (options.onClick) {
+      el.addEventListener('click', () => options.onClick(tile, el));
+    }
+
+    return el;
+  },
+
+  // Render a face-down tile (for opponents' hands)
+  renderBack(vertical = false) {
+    const el = document.createElement('div');
+    el.className = 'tile-back';
+    if (vertical) el.classList.add('tile-back-vertical');
+    return el;
+  },
+
+  // Render a meld (set of 3-4 tiles - peng or gang)
+  renderMeld(meld, options = {}) {
+    const el = document.createElement('div');
+    el.className = 'meld';
+    const count = meld.type === 'gang' ? 4 : 3;
+    const isAnGang = meld.type === 'angang';
+
+    for (let i = 0; i < count; i++) {
+      if (isAnGang && (i === 0 || i === 3)) {
+        // Concealed gang - show backs on outer tiles
+        el.appendChild(this.renderBack());
+      } else {
+        el.appendChild(this.renderTile(meld.tile, { small: true }));
+      }
+    }
+    return el;
+  },
+
+  // Count occurrences of each tile in a hand
+  countTiles(hand) {
+    const counts = {};
+    for (const tile of hand) {
+      counts[tile] = (counts[tile] || 0) + 1;
+    }
+    return counts;
+  },
+
+  // Count tiles by suit
+  countBySuit(hand) {
+    const counts = { m: 0, s: 0, p: 0 };
+    for (const tile of hand) {
+      counts[tile[0]]++;
+    }
+    return counts;
+  },
+
+  // Remove first occurrence of a tile from hand
+  removeOne(hand, tile) {
+    const idx = hand.indexOf(tile);
+    if (idx >= 0) {
+      const newHand = hand.slice();
+      newHand.splice(idx, 1);
+      return newHand;
+    }
+    return hand;
+  },
+
+  // Get the suit of a tile
+  suitOf(tile) {
+    return tile[0];
+  },
+
+  // Get number of a tile
+  numOf(tile) {
+    return parseInt(tile.slice(1), 10);
+  },
+};
+
+
+// ========== rules.js ==========
+/* ============================================
+   RULES ENGINE
+   Sichuan Mahjong "Blood Battle to the End"
+   - Hu (win) detection
+   - Fan (score multiplier) calculation
+   - Action eligibility (peng/gang)
+   ============================================ */
+
+
+const Rules = {
+
+  /**
+   * Check if a 14-tile hand can form a valid winning structure:
+   * 4 sets (triplets or sequences) + 1 pair, OR
+   * 7 pairs (qidui)
+   * Note: hand must include the winning tile.
+   */
+  canHu(hand, melds = []) {
+    if (hand.length === 0) return false;
+    // The hand must total 14 tiles when including all melds (3 per meld for peng, 4 for gang)
+    const meldTileCount = melds.reduce((sum, m) => sum + (m.type === 'gang' || m.type === 'angang' ? 4 : 3), 0);
+    const needed = 14 - meldTileCount + melds.filter(m => m.type === 'gang' || m.type === 'angang').length;
+    // Simplified: hand tiles + 3 * meldCount should equal 14 for standard
+    // Actually for sichuan, each gang doesn't add to the 14-tile structure since gang = triplet
+    if (hand.length + melds.length * 3 !== 14) return false;
+
+    const counts = Tiles.countTiles(hand);
+
+    // Check seven pairs (only valid with no melds)
+    if (melds.length === 0 && this.isQiDui(counts)) return true;
+
+    // Check standard 4 sets + 1 pair
+    return this.isStandardHu(counts, 4 - melds.length);
+  },
+
+  // Seven pairs: all tile counts must be even (2 or 4), and total must equal 14
+  isQiDui(counts) {
+    const values = Object.values(counts);
+    const total = values.reduce((a, b) => a + b, 0);
+    if (total !== 14) return false;
+    return values.every(c => c === 2 || c === 4);
+  },
+
+  // Check if remaining tiles can form `setsNeeded` sets + 1 pair
+  isStandardHu(countsObj, setsNeeded) {
+    // Try each tile as the pair, then verify the rest forms sets
+    const tiles = Object.keys(countsObj).filter(t => countsObj[t] >= 2);
+    for (const pairTile of tiles) {
+      const counts = { ...countsObj };
+      counts[pairTile] -= 2;
+      if (this.canFormSets(counts, setsNeeded)) {
+        return true;
+      }
+    }
+    return false;
+  },
+
+  // Recursively check whether the count map forms exactly `setsNeeded` triplets/sequences
+  canFormSets(counts, setsNeeded) {
+    // Find first tile with non-zero count
+    const tiles = Object.keys(counts).filter(t => counts[t] > 0).sort();
+    if (tiles.length === 0) return setsNeeded === 0;
+    if (setsNeeded === 0) return false;
+
+    const first = tiles[0];
+    const { suit, num } = Tiles.parse(first);
+
+    // Try triplet
+    if (counts[first] >= 3) {
+      counts[first] -= 3;
+      if (this.canFormSets(counts, setsNeeded - 1)) {
+        counts[first] += 3;
+        return true;
+      }
+      counts[first] += 3;
+    }
+
+    // Try sequence (only within same suit, num+1 and num+2)
+    if (num <= 7) {
+      const t2 = suit + (num + 1);
+      const t3 = suit + (num + 2);
+      if ((counts[t2] || 0) >= 1 && (counts[t3] || 0) >= 1) {
+        counts[first]--;
+        counts[t2]--;
+        counts[t3]--;
+        if (this.canFormSets(counts, setsNeeded - 1)) {
+          counts[first]++;
+          counts[t2]++;
+          counts[t3]++;
+          return true;
+        }
+        counts[first]++;
+        counts[t2]++;
+        counts[t3]++;
+      }
+    }
+
+    return false;
+  },
+
+  /**
+   * Check if hand contains the missing suit (cannot Hu in Sichuan rules)
+   */
+  hasMissingSuit(hand, melds, missing) {
+    if (hand.some(t => Tiles.suitOf(t) === missing)) return true;
+    if (melds.some(m => Tiles.suitOf(m.tile) === missing)) return true;
+    return false;
+  },
+
+  /**
+   * Full hu validation: check structure + Sichuan rules (缺一门)
+   */
+  validateHu(hand, melds, missing, winTile) {
+    // Must have the win tile in hand
+    if (!hand.includes(winTile)) return false;
+    // Cannot have missing suit
+    if (this.hasMissingSuit(hand, melds, missing)) return false;
+    return this.canHu(hand, melds);
+  },
+
+  /**
+   * Check if player can call peng on a tile (already has 2 of them)
+   */
+  canPeng(hand, tile, missing) {
+    if (Tiles.suitOf(tile) === missing) return false;
+    return hand.filter(t => t === tile).length >= 2;
+  },
+
+  /**
+   * Check if player can call ming-gang on a discarded tile (already has 3 of them)
+   */
+  canMingGang(hand, tile, missing) {
+    if (Tiles.suitOf(tile) === missing) return false;
+    return hand.filter(t => t === tile).length >= 3;
+  },
+
+  /**
+   * Find all possible an-gang (concealed gang) tiles in hand (4 of a kind)
+   */
+  findAnGang(hand, missing) {
+    const counts = Tiles.countTiles(hand);
+    return Object.keys(counts).filter(t =>
+      counts[t] === 4 && Tiles.suitOf(t) !== missing
+    );
+  },
+
+  /**
+   * Find tiles in hand that match an existing peng meld (for added gang)
+   */
+  findAddGang(hand, melds, missing) {
+    const pengTiles = melds.filter(m => m.type === 'peng').map(m => m.tile);
+    return hand.filter(t =>
+      pengTiles.includes(t) && Tiles.suitOf(t) !== missing
+    );
+  },
+
+  /**
+   * Calculate fan (multiplier) for a winning hand.
+   * Returns: { fan, types: [...names], score }
+   */
+  calculateFan(hand, melds, winTile, options = {}) {
+    const types = [];
+    let fan = 1; // Base: 平胡 1 fan (or sometimes 0 base, +1 for self-draw etc.)
+
+    const allTiles = [...hand];
+    melds.forEach(m => {
+      const count = (m.type === 'gang' || m.type === 'angang') ? 4 : 3;
+      for (let i = 0; i < count; i++) allTiles.push(m.tile);
+    });
+
+    const counts = Tiles.countTiles(hand);
+    const suitCounts = Tiles.countBySuit(allTiles);
+
+    // Check 清一色 (all same suit) - 4 fan
+    const distinctSuits = Object.entries(suitCounts).filter(([_, c]) => c > 0).length;
+    if (distinctSuits === 1) {
+      fan += 4;
+      types.push({ name: '清一色', fan: 4 });
+    }
+
+    // Check 七对 / 龙七对 (seven pairs)
+    let isQiDui = false;
+    if (melds.length === 0 && Rules.isQiDui(counts)) {
+      isQiDui = true;
+      const hasFour = Object.values(counts).filter(c => c === 4).length;
+      if (hasFour > 0) {
+        // 龙七对: 8 fan, each extra pair of 4 adds more
+        fan += 8;
+        types.push({ name: '龙七对', fan: 8 });
+        if (hasFour > 1) {
+          fan += (hasFour - 1) * 2;
+          types.push({ name: `双龙七对 ×${hasFour}`, fan: (hasFour - 1) * 2 });
+        }
+      } else {
+        fan += 4;
+        types.push({ name: '七对', fan: 4 });
+      }
+    }
+
+    // Check 对对胡 (all triplets, no sequences) - skip if qidui
+    if (!isQiDui) {
+      const isDuiDui = this.isDuiDuiHu(hand, melds);
+      if (isDuiDui) {
+        fan += 2;
+        types.push({ name: '对对胡', fan: 2 });
+      }
+    }
+
+    // 根 (4 identical tiles in melds count as gang already; for hand quartets in qidui already counted)
+    // For non-qidui, count gang separately
+    if (!isQiDui) {
+      const gangs = melds.filter(m => m.type === 'gang' || m.type === 'angang');
+      gangs.forEach(g => {
+        if (g.type === 'angang') {
+          fan += 2;
+          types.push({ name: '暗杠', fan: 2 });
+        } else {
+          fan += 1;
+          types.push({ name: '明杠', fan: 1 });
+        }
+      });
+    }
+
+    // 自摸 (self-draw) - 1 fan
+    if (options.zimo) {
+      fan += 1;
+      types.push({ name: '自摸', fan: 1 });
+    }
+
+    // 杠上花 (win on gang-draw)
+    if (options.gangshanghua) {
+      fan += 2;
+      types.push({ name: '杠上花', fan: 2 });
+    }
+
+    // 抢杠胡 (rob the gang)
+    if (options.qiangganghu) {
+      fan += 2;
+      types.push({ name: '抢杠胡', fan: 2 });
+    }
+
+    // 海底捞月 (last tile)
+    if (options.haidi) {
+      fan += 1;
+      types.push({ name: '海底捞月', fan: 1 });
+    }
+
+    // Cap fan to prevent runaway (typical Sichuan rule: max 4 fan = 16x base, but we'll allow up to 8 fan = 256x)
+    const cappedFan = Math.min(fan, 8);
+    const baseScore = 1;
+    const score = baseScore * Math.pow(2, cappedFan - 1);
+
+    return { fan: cappedFan, rawFan: fan, types, score };
+  },
+
+  /**
+   * Check if hand is duidui (all triplets - pengpeng hu)
+   * All melds must be triplets/gangs, and the hand portion must be triplets + 1 pair
+   */
+  isDuiDuiHu(hand, melds) {
+    // All melds are by definition peng/gang (triplets/quads), so check hand
+    const counts = Tiles.countTiles(hand);
+    let pairs = 0;
+    let triplets = 0;
+    for (const t of Object.keys(counts)) {
+      const c = counts[t];
+      if (c === 2) pairs++;
+      else if (c === 3) triplets++;
+      else if (c === 4) { triplets++; /* extra one is awkward */ return false; }
+      else return false;
+    }
+    return pairs === 1 && (pairs + triplets) === (5 - melds.length);
+  },
+
+  /**
+   * Suggest the best missing suit (the one with fewest tiles)
+   */
+  suggestMissing(hand) {
+    const counts = Tiles.countBySuit(hand);
+    let minSuit = 'm';
+    let minCount = counts.m;
+    if (counts.s < minCount) { minSuit = 's'; minCount = counts.s; }
+    if (counts.p < minCount) { minSuit = 'p'; minCount = counts.p; }
+    return minSuit;
+  },
+
+  /**
+   * After missing-suit is chosen, check if any winning tile would complete the hand.
+   * Returns array of tiles that would win.
+   */
+  findTingTiles(hand, melds, missing) {
+    const tingTiles = [];
+    const suits = ['m', 's', 'p'].filter(s => s !== missing);
+    for (const suit of suits) {
+      for (let n = 1; n <= 9; n++) {
+        const tile = suit + n;
+        const testHand = [...hand, tile];
+        if (this.canHu(testHand, melds) && !this.hasMissingSuit(testHand, melds, missing)) {
+          tingTiles.push(tile);
+        }
+      }
+    }
+    return tingTiles;
+  },
+
+  /**
+   * Check if a player is in "ting" state (one tile away from winning)
+   */
+  isTing(hand, melds, missing) {
+    return this.findTingTiles(hand, melds, missing).length > 0;
+  },
+};
+
+
+// ========== ai.js ==========
+/* ============================================
+   AI MODULE
+   Computer opponents with three difficulty levels:
+   - easy: random-ish with basic logic
+   - medium: heuristic shanten-style evaluation
+   - hard: deeper lookahead, discard tracking
+   ============================================ */
+
+const AI = {
+
+  /**
+   * Choose which suit to be missing.
+   * AI always picks the suit with fewest tiles.
+   */
+  chooseMissing(hand, level) {
+    const counts = Tiles.countBySuit(hand);
+    // Hard AI considers tile distribution more carefully (avoid breaking up pairs/triplets)
+    if (level === 'hard') {
+      const scores = {};
+      for (const suit of ['m', 's', 'p']) {
+        const suitTiles = hand.filter(t => Tiles.suitOf(t) === suit);
+        const tileCounts = Tiles.countTiles(suitTiles);
+        let value = 0;
+        for (const t of Object.keys(tileCounts)) {
+          const c = tileCounts[t];
+          if (c >= 3) value += 10;
+          else if (c === 2) value += 4;
+          else value += 1;
+        }
+        // Also account for sequence potential
+        const nums = suitTiles.map(t => Tiles.numOf(t)).sort((a, b) => a - b);
+        for (let i = 0; i < nums.length - 1; i++) {
+          if (nums[i + 1] - nums[i] <= 2) value += 2;
+        }
+        scores[suit] = value;
+      }
+      // Pick the suit with LOWEST value (least worth keeping)
+      return Object.keys(scores).reduce((min, s) => scores[s] < scores[min] ? s : min);
+    }
+
+    // Easy/medium: just pick fewest tiles
+    return Rules.suggestMissing(hand);
+  },
+
+  /**
+   * Decide what to discard from hand.
+   * Returns the tile to discard.
+   */
+  chooseDiscard(player, level) {
+    const { hand, missing, melds } = player;
+
+    // RULE 1: If we have any missing-suit tiles, discard them first
+    const missingTiles = hand.filter(t => Tiles.suitOf(t) === missing);
+    if (missingTiles.length > 0) {
+      // Discard the most isolated missing-suit tile (highest or lowest first)
+      return this.pickMostIsolated(missingTiles, hand);
+    }
+
+    // RULE 2: Otherwise, evaluate each tile and discard the least valuable
+    return this.pickLeastValuable(hand, melds, missing, level);
+  },
+
+  /**
+   * Pick the most isolated tile (least connected to others)
+   */
+  pickMostIsolated(candidates, hand) {
+    let bestTile = candidates[0];
+    let bestScore = -Infinity;
+    for (const tile of candidates) {
+      const score = -this.tileConnectivity(tile, hand);
+      if (score > bestScore) {
+        bestScore = score;
+        bestTile = tile;
+      }
+    }
+    return bestTile;
+  },
+
+  /**
+   * Measure how connected a tile is to others in the hand
+   */
+  tileConnectivity(tile, hand) {
+    const { suit, num } = Tiles.parse(tile);
+    let score = 0;
+    for (const other of hand) {
+      if (other === tile) continue;
+      const op = Tiles.parse(other);
+      if (op.suit !== suit) continue;
+      const diff = Math.abs(op.num - num);
+      if (diff === 0) score += 3; // same tile (pair/triplet potential)
+      else if (diff === 1) score += 2; // adjacent
+      else if (diff === 2) score += 1; // gap of 2
+    }
+    return score;
+  },
+
+  /**
+   * Pick the least valuable tile to discard
+   */
+  pickLeastValuable(hand, melds, missing, level) {
+    const uniqueTiles = [...new Set(hand)];
+    let worstTile = uniqueTiles[0];
+    let worstScore = Infinity;
+
+    for (const tile of uniqueTiles) {
+      const score = this.evaluateTileValue(tile, hand, melds, missing, level);
+      if (score < worstScore) {
+        worstScore = score;
+        worstTile = tile;
+      }
+    }
+    return worstTile;
+  },
+
+  /**
+   * Evaluate the value of keeping a tile in hand.
+   * Higher = more valuable to keep.
+   */
+  evaluateTileValue(tile, hand, melds, missing, level) {
+    const counts = Tiles.countTiles(hand);
+    const count = counts[tile] || 0;
+    const { suit, num } = Tiles.parse(tile);
+
+    let value = 0;
+
+    // Multiples are very valuable
+    if (count >= 3) value += 100;
+    else if (count === 2) value += 30;
+    else value += 5;
+
+    // Connectivity bonus
+    value += this.tileConnectivity(tile, hand) * 2;
+
+    // Edge tiles (1, 9) are slightly less flexible
+    if (num === 1 || num === 9) value -= 3;
+    else if (num === 2 || num === 8) value -= 1;
+    else value += 1; // middle tiles are flexible
+
+    // Hard AI: consider what's been discarded (defensive play)
+    if (level === 'hard' && Game.state) {
+      const discarded = Game.getAllDiscards();
+      const discardedCount = discarded.filter(t => t === tile).length;
+      // If many copies already discarded, less useful
+      value -= discardedCount * 3;
+
+      // Defensive: if tile is unlikely to be useful in hand, drop it
+      if (count === 1 && this.tileConnectivity(tile, hand) === 0) {
+        value -= 10;
+      }
+    }
+
+    // Medium/hard: check shanten improvement (would removing this tile keep us close to ting?)
+    if (level !== 'easy' && count === 1) {
+      // Test if removing this tile breaks anything
+      const testHand = Tiles.removeOne(hand, tile);
+      if (Rules.isTing(testHand, melds, missing)) {
+        // We're tenpai without this tile - discard it
+        value -= 50;
+      }
+    }
+
+    return value;
+  },
+
+  /**
+   * Decide whether to call peng on an opponent's discard.
+   * Returns true to call, false to skip.
+   */
+  shouldPeng(player, tile, level) {
+    if (!Rules.canPeng(player.hand, tile, player.missing)) return false;
+
+    // Easy: always peng if possible (greedy)
+    if (level === 'easy') return Math.random() < 0.6;
+
+    // Medium/hard: only peng if it brings us closer to ting
+    const handAfterPeng = Tiles.removeOne(Tiles.removeOne(player.hand, tile), tile);
+    const newMelds = [...player.melds, { type: 'peng', tile }];
+
+    // Don't peng if we'd need to discard a useful tile right after
+    const wasTing = Rules.isTing(player.hand, player.melds, player.missing);
+    const isTingAfter = Rules.isTing(handAfterPeng, newMelds, player.missing);
+
+    if (isTingAfter && !wasTing) return true; // makes us ting → peng
+    if (wasTing && !isTingAfter) return false; // breaks our ting → skip
+
+    // Otherwise, peng if we have many of that suit (commitment) or it's a duidui-style hand
+    const suitCount = player.hand.filter(t => Tiles.suitOf(t) === Tiles.suitOf(tile)).length;
+    const counts = Tiles.countTiles(player.hand);
+    const tripletPotential = Object.values(counts).filter(c => c >= 2).length;
+
+    if (level === 'hard') {
+      return tripletPotential >= 3 && suitCount >= 4;
+    }
+    return Math.random() < 0.5 && tripletPotential >= 2;
+  },
+
+  /**
+   * Decide whether to gang.
+   * AI always gangs if it doesn't break ting.
+   */
+  shouldGang(player, tile, level, isAnGang) {
+    if (level === 'easy') return true;
+
+    // Test if gang breaks our ting state
+    let testHand, testMelds;
+    if (isAnGang) {
+      testHand = player.hand.filter(t => t !== tile);
+      testMelds = [...player.melds, { type: 'angang', tile }];
+    } else {
+      // ming gang from discard
+      testHand = player.hand.filter(t => t !== tile);
+      // would have removed 3, but only need to remove the 3 we held; here we keep it simple
+      testHand = player.hand.slice();
+      let removed = 0;
+      testHand = testHand.filter(t => {
+        if (t === tile && removed < 3) { removed++; return false; }
+        return true;
+      });
+      testMelds = [...player.melds, { type: 'gang', tile }];
+    }
+
+    return true; // Sichuan tradition: usually gang for the fan bonus
+  },
+
+  /**
+   * Decide whether to declare hu (win).
+   * In blood-battle, you can choose NOT to hu (to wait for a bigger hand),
+   * but generally easy/medium AI always hu's.
+   */
+  shouldHu(player, winTile, level, options) {
+    // Easy AI: always hu
+    if (level === 'easy') return true;
+
+    // Medium/hard: usually hu, but might wait if very low value and early game
+    const handForCheck = [...player.hand];
+    if (!handForCheck.includes(winTile)) handForCheck.push(winTile);
+    const result = Rules.calculateFan(handForCheck, player.melds, winTile, options);
+
+    // If only base fan and early game, hard AI might pass (qiangganghu chase)
+    // But for stability, just always hu
+    return true;
+  },
+};
+
+// ========== sound.js ==========
+/* ============================================
+   SOUND MODULE
+   Programmatic audio synthesis via Web Audio API
+   No external files needed - all sounds generated on-demand
+   ============================================ */
+
+const Sound = {
+
+  ctx: null,
+  enabled: true,
+  masterVolume: 0.5,
+
+  /**
+   * Initialize audio context (must be called from user gesture due to browser policy)
+   */
+  init() {
+    if (this.ctx) return;
+    try {
+      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch (e) {
+      console.warn('Web Audio not supported:', e);
+      this.enabled = false;
+    }
+  },
+
+  /**
+   * Ensure audio context is running (browsers suspend it until user gesture)
+   */
+  resume() {
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+  },
+
+  /**
+   * Build an envelope-shaped tone
+   * params: { freq, type, duration, attack, decay, sustain, release, volume, pan }
+   */
+  tone(params) {
+    if (!this.enabled || !this.ctx) return;
+    const ctx = this.ctx;
+    const now = ctx.currentTime;
+    const {
+      freq = 440,
+      type = 'sine',
+      duration = 0.2,
+      attack = 0.005,
+      decay = 0.05,
+      sustain = 0.3,
+      release = 0.1,
+      volume = 0.3,
+      pan = 0,
+      freqEnd = null,  // for pitch sweeps
+    } = params;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const panner = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
+
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, now);
+    if (freqEnd !== null) {
+      osc.frequency.exponentialRampToValueAtTime(Math.max(freqEnd, 1), now + duration);
+    }
+
+    // ADSR envelope
+    const peak = volume * this.masterVolume;
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(peak, now + attack);
+    gain.gain.linearRampToValueAtTime(peak * sustain, now + attack + decay);
+    gain.gain.setValueAtTime(peak * sustain, now + duration - release);
+    gain.gain.linearRampToValueAtTime(0, now + duration);
+
+    osc.connect(gain);
+    if (panner) {
+      panner.pan.setValueAtTime(pan, now);
+      gain.connect(panner);
+      panner.connect(ctx.destination);
+    } else {
+      gain.connect(ctx.destination);
+    }
+
+    osc.start(now);
+    osc.stop(now + duration + 0.05);
+  },
+
+  /**
+   * Generate filtered noise (for percussive sounds like tile clacks)
+   */
+  noise(params) {
+    if (!this.enabled || !this.ctx) return;
+    const ctx = this.ctx;
+    const now = ctx.currentTime;
+    const {
+      duration = 0.1,
+      volume = 0.3,
+      filterFreq = 2000,
+      filterQ = 1,
+      filterType = 'bandpass',
+      attack = 0.001,
+      release = 0.05,
+    } = params;
+
+    // Create a short noise buffer
+    const bufferSize = Math.floor(ctx.sampleRate * duration);
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1);
+    }
+
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = filterType;
+    filter.frequency.setValueAtTime(filterFreq, now);
+    filter.Q.setValueAtTime(filterQ, now);
+
+    const gain = ctx.createGain();
+    const peak = volume * this.masterVolume;
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(peak, now + attack);
+    gain.gain.linearRampToValueAtTime(0, now + duration);
+
+    source.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    source.start(now);
+    source.stop(now + duration + 0.01);
+  },
+
+  // ============================================
+  // GAME SOUND EFFECTS
+  // ============================================
+
+  /**
+   * Tile click / hover - very subtle wooden tap
+   */
+  tileClick() {
+    this.noise({
+      duration: 0.05,
+      volume: 0.15,
+      filterFreq: 3500,
+      filterQ: 3,
+      filterType: 'bandpass',
+    });
+  },
+
+  /**
+   * Discarding a tile - solid wooden CLACK
+   */
+  discard() {
+    if (!this.enabled || !this.ctx) return;
+    // Layer: high-frequency noise burst + low body thump
+    this.noise({
+      duration: 0.08,
+      volume: 0.35,
+      filterFreq: 2800,
+      filterQ: 2,
+      filterType: 'bandpass',
+    });
+    this.tone({
+      freq: 180,
+      freqEnd: 90,
+      type: 'sine',
+      duration: 0.1,
+      attack: 0.001,
+      decay: 0.02,
+      sustain: 0.3,
+      release: 0.08,
+      volume: 0.4,
+    });
+  },
+
+  /**
+   * Drawing a tile - softer paper-shuffle sound
+   */
+  draw() {
+    this.noise({
+      duration: 0.12,
+      volume: 0.18,
+      filterFreq: 4500,
+      filterQ: 1,
+      filterType: 'highpass',
+      release: 0.1,
+    });
+  },
+
+  /**
+   * PENG! - bold, decisive double-thump
+   */
+  peng() {
+    if (!this.enabled || !this.ctx) return;
+    // Two quick thumps with bell-like overtones
+    const ctx = this.ctx;
+    const now = ctx.currentTime;
+
+    // First thump
+    this.tone({
+      freq: 260, freqEnd: 130, type: 'sine',
+      duration: 0.18, attack: 0.002, decay: 0.04, sustain: 0.4, release: 0.13,
+      volume: 0.5,
+    });
+    this.noise({
+      duration: 0.08, volume: 0.3,
+      filterFreq: 2200, filterQ: 1.5, filterType: 'bandpass',
+    });
+
+    // Second thump 80ms later with higher pitch
+    setTimeout(() => {
+      this.tone({
+        freq: 380, freqEnd: 190, type: 'sine',
+        duration: 0.22, attack: 0.002, decay: 0.05, sustain: 0.4, release: 0.15,
+        volume: 0.45,
+      });
+      this.noise({
+        duration: 0.08, volume: 0.3,
+        filterFreq: 2800, filterQ: 1.5, filterType: 'bandpass',
+      });
+    }, 80);
+  },
+
+  /**
+   * GANG! - powerful triple-thump with a metallic ring
+   */
+  gang() {
+    if (!this.enabled || !this.ctx) return;
+
+    // Three rapid thumps escalating
+    [0, 70, 140].forEach((delay, i) => {
+      setTimeout(() => {
+        const baseFreq = 220 + i * 80;
+        this.tone({
+          freq: baseFreq, freqEnd: baseFreq * 0.5, type: 'sine',
+          duration: 0.18, attack: 0.002, decay: 0.04, sustain: 0.4, release: 0.13,
+          volume: 0.5,
+        });
+        this.noise({
+          duration: 0.08, volume: 0.3,
+          filterFreq: 2500 + i * 400, filterQ: 1.5, filterType: 'bandpass',
+        });
+      }, delay);
+    });
+
+    // Metallic ring on top
+    setTimeout(() => {
+      this.tone({
+        freq: 1200, freqEnd: 900, type: 'triangle',
+        duration: 0.5, attack: 0.005, decay: 0.1, sustain: 0.3, release: 0.4,
+        volume: 0.2,
+      });
+      this.tone({
+        freq: 1800, freqEnd: 1500, type: 'sine',
+        duration: 0.6, attack: 0.005, decay: 0.1, sustain: 0.2, release: 0.5,
+        volume: 0.12,
+      });
+    }, 100);
+  },
+
+  /**
+   * HU! - triumphant chord with bell shimmer
+   */
+  hu() {
+    if (!this.enabled || !this.ctx) return;
+
+    // Major chord ascending (C - E - G - C high)
+    const notes = [
+      { freq: 523, delay: 0 },     // C5
+      { freq: 659, delay: 70 },    // E5
+      { freq: 784, delay: 140 },   // G5
+      { freq: 1047, delay: 210 },  // C6
+    ];
+
+    notes.forEach(({ freq, delay }) => {
+      setTimeout(() => {
+        this.tone({
+          freq, type: 'sine',
+          duration: 0.8, attack: 0.01, decay: 0.1, sustain: 0.5, release: 0.7,
+          volume: 0.3,
+        });
+        // Overtone
+        this.tone({
+          freq: freq * 2, type: 'sine',
+          duration: 0.6, attack: 0.01, decay: 0.1, sustain: 0.3, release: 0.5,
+          volume: 0.1,
+        });
+      }, delay);
+    });
+
+    // Big drum hit at start
+    this.tone({
+      freq: 100, freqEnd: 50, type: 'sine',
+      duration: 0.4, attack: 0.001, decay: 0.05, sustain: 0.3, release: 0.34,
+      volume: 0.5,
+    });
+
+    // Cymbal-like shimmer
+    setTimeout(() => {
+      this.noise({
+        duration: 0.8, volume: 0.15,
+        filterFreq: 6000, filterQ: 0.5, filterType: 'highpass',
+        attack: 0.01, release: 0.7,
+      });
+    }, 100);
+  },
+
+  /**
+   * ZIMO (self-draw win) - similar to hu but with extra flourish
+   */
+  zimo() {
+    this.hu();
+    // Add ascending arpeggio after
+    setTimeout(() => {
+      const notes = [659, 784, 988, 1175]; // E G B D ascending
+      notes.forEach((freq, i) => {
+        setTimeout(() => {
+          this.tone({
+            freq, type: 'triangle',
+            duration: 0.3, attack: 0.005, decay: 0.05, sustain: 0.4, release: 0.25,
+            volume: 0.18,
+          });
+        }, i * 60);
+      });
+    }, 400);
+  },
+
+  /**
+   * Missing-suit selection confirmation
+   */
+  missingSelect() {
+    this.tone({
+      freq: 440, freqEnd: 660, type: 'triangle',
+      duration: 0.25, attack: 0.01, decay: 0.05, sustain: 0.5, release: 0.2,
+      volume: 0.25,
+    });
+  },
+
+  /**
+   * Player turn change - subtle ding
+   */
+  yourTurn() {
+    this.tone({
+      freq: 880, type: 'sine',
+      duration: 0.15, attack: 0.005, decay: 0.05, sustain: 0.3, release: 0.1,
+      volume: 0.18,
+    });
+    setTimeout(() => {
+      this.tone({
+        freq: 1320, type: 'sine',
+        duration: 0.2, attack: 0.005, decay: 0.05, sustain: 0.3, release: 0.15,
+        volume: 0.15,
+      });
+    }, 80);
+  },
+
+  /**
+   * Warning / illegal action
+   */
+  warning() {
+    this.tone({
+      freq: 200, freqEnd: 150, type: 'sawtooth',
+      duration: 0.2, attack: 0.005, decay: 0.05, sustain: 0.4, release: 0.15,
+      volume: 0.2,
+    });
+  },
+
+  /**
+   * Button click - UI feedback
+   */
+  buttonClick() {
+    this.tone({
+      freq: 600, type: 'sine',
+      duration: 0.08, attack: 0.002, decay: 0.02, sustain: 0.3, release: 0.06,
+      volume: 0.15,
+    });
+  },
+
+  /**
+   * Shuffling/dealing sound at round start
+   */
+  shuffle() {
+    if (!this.enabled || !this.ctx) return;
+    // Rapid succession of tile clacks
+    for (let i = 0; i < 8; i++) {
+      setTimeout(() => {
+        this.noise({
+          duration: 0.04,
+          volume: 0.2,
+          filterFreq: 2500 + Math.random() * 1500,
+          filterQ: 2,
+          filterType: 'bandpass',
+        });
+      }, i * 60);
+    }
+  },
+
+  /**
+   * Round end / game over - descending chord
+   */
+  roundEnd() {
+    const notes = [523, 440, 349, 262]; // C A F C descending
+    notes.forEach((freq, i) => {
+      setTimeout(() => {
+        this.tone({
+          freq, type: 'sine',
+          duration: 0.4, attack: 0.01, decay: 0.05, sustain: 0.4, release: 0.34,
+          volume: 0.25,
+        });
+      }, i * 120);
+    });
+  },
+
+  /**
+   * Toggle sound on/off
+   */
+  setEnabled(enabled) {
+    this.enabled = enabled;
+  },
+};
+
+// ========== game.js ==========
+/* ============================================
+   GAME ENGINE
+   State machine for Sichuan Blood-Battle Mahjong
+   ============================================ */
+
+const Game = {
+
+  // The single source of truth for game state
+  state: null,
+
+  /**
+   * Initialize a new game.
+   * difficulty: 'easy' | 'medium' | 'hard'
+   */
+  startSinglePlayer(difficulty = 'medium') {
+    UI.closeModal('difficulty-modal');
+    UI.showScreen('game-screen');
+    // Initialize audio on first user gesture (clicking the start button)
+    Sound.init();
+    Sound.resume();
+    Sound.shuffle();
+    this.isOnline = false; // ensure we're in offline mode
+    UI.setConnectionStatus(false); // hide indicator
+    this.state = this.createInitialState(difficulty);
+    this.dealInitialHands();
+    UI.renderAll();
+    // Show missing-suit selection for human player
+    setTimeout(() => UI.showMissingOverlay(), 600);
+  },
+
+  /**
+   * Build the initial game state object.
+   * Players: 0=human (south), 1=east, 2=north, 3=west
+   */
+  createInitialState(difficulty) {
+    const deck = Tiles.shuffle(Tiles.buildDeck());
+    return {
+      difficulty,
+      wall: deck,
+      players: [0, 1, 2, 3].map(i => ({
+        index: i,
+        name: ['我', '李叔', '老王', '三姐'][i],
+        hand: [],
+        melds: [],
+        discards: [],
+        missing: null,
+        score: 0,
+        hasHu: false,
+        huInfo: null,  // { types, fan, score, fromPlayer, tile }
+        isAI: i !== 0,
+      })),
+      dealer: 0,
+      currentTurn: 0,
+      lastDiscard: null,
+      lastDiscardPlayer: -1,
+      phase: 'setup', // setup, choosing-missing, playing, ended
+      round: 1,
+      // Action prompts pending for the human player
+      pendingActions: null,
+      // Track gang flow for gangshanghua / qiangganghu
+      gangPending: false,
+      lastDrawWasGang: false,
+    };
+  },
+
+  /**
+   * Deal 13 tiles to each player. Dealer (player 0) gets the 14th later.
+   */
+  dealInitialHands() {
+    for (let i = 0; i < 13; i++) {
+      for (let p = 0; p < 4; p++) {
+        this.state.players[p].hand.push(this.state.wall.shift());
+      }
+    }
+    // Sort hands
+    for (const player of this.state.players) {
+      player.hand = Tiles.sortHand(player.hand);
+    }
+  },
+
+  /**
+   * Human chooses their missing suit
+   */
+  chooseMissing(suit) {
+    // Route to online controller if in online mode
+    if (this.isOnline) {
+      OnlineGame.onChooseMissing(suit);
+      return;
+    }
+
+    this.state.players[0].missing = suit;
+    UI.hideMissingOverlay();
+    Sound.missingSelect();
+    // AIs choose their missing suit
+    for (let i = 1; i < 4; i++) {
+      this.state.players[i].missing = AI.chooseMissing(
+        this.state.players[i].hand,
+        this.state.difficulty
+      );
+    }
+    UI.renderAll();
+    UI.toast(`你选择了缺${Tiles.getSuitName(suit)}`, 'success');
+    // Begin play
+    this.state.phase = 'playing';
+    setTimeout(() => this.startTurn(this.state.dealer), 800);
+  },
+
+  /**
+   * Suggest missing for human
+   */
+  suggestMissing() {
+    const suit = Rules.suggestMissing(this.state.players[0].hand);
+    this.chooseMissing(suit);
+  },
+
+  /**
+   * Begin a turn for the given player: draw a tile
+   */
+  startTurn(playerIdx) {
+    if (this.state.phase === 'ended') return;
+
+    // Check if all but one have hu'd or wall is empty
+    const activePlayers = this.state.players.filter(p => !p.hasHu);
+    if (activePlayers.length <= 1 || this.state.wall.length === 0) {
+      this.endRound();
+      return;
+    }
+
+    // Skip players who already hu'd
+    while (this.state.players[playerIdx].hasHu) {
+      playerIdx = (playerIdx + 1) % 4;
+    }
+
+    this.state.currentTurn = playerIdx;
+    const player = this.state.players[playerIdx];
+
+    // Draw a tile
+    if (this.state.wall.length === 0) {
+      this.endRound();
+      return;
+    }
+
+    const drawnTile = this.state.wall.shift();
+    player.hand.push(drawnTile);
+    player.hand = Tiles.sortHand(player.hand);
+    Sound.draw();
+
+    UI.renderAll();
+    UI.updateTurnIndicator(playerIdx);
+
+    // Play turn-change sound for human
+    if (playerIdx === 0) {
+      Sound.yourTurn();
+    }
+
+    // Check if self-draw is a win for this player
+    if (this.canPlayerHu(playerIdx, drawnTile, true)) {
+      if (playerIdx === 0) {
+        // Show hu button to human
+        this.state.pendingActions = { hu: true, zimo: true, winTile: drawnTile };
+        UI.showActions();
+        UI.showHint('自摸胡牌！');
+        return;
+      } else {
+        // AI decides
+        if (AI.shouldHu(player, drawnTile, this.state.difficulty, { zimo: true })) {
+          setTimeout(() => this.declareHu(playerIdx, drawnTile, true), 600);
+          return;
+        }
+      }
+    }
+
+    // Check for concealed gang opportunity (only for current player on their own turn)
+    const angangTiles = Rules.findAnGang(player.hand, player.missing);
+    const addGangTiles = Rules.findAddGang(player.hand, player.melds, player.missing);
+
+    if (playerIdx === 0) {
+      // Human: present options if any
+      if (angangTiles.length > 0 || addGangTiles.length > 0) {
+        this.state.pendingActions = {
+          gang: true,
+          angangTiles,
+          addGangTiles,
+          pass: true
+        };
+        UI.showActions();
+      }
+      // Human will manually click a tile to discard
+    } else {
+      // AI: decide gang or discard
+      if (angangTiles.length > 0 && AI.shouldGang(player, angangTiles[0], this.state.difficulty, true)) {
+        setTimeout(() => this.performAnGang(playerIdx, angangTiles[0]), 600);
+        return;
+      }
+      if (addGangTiles.length > 0 && AI.shouldGang(player, addGangTiles[0], this.state.difficulty, false)) {
+        setTimeout(() => this.performAddGang(playerIdx, addGangTiles[0]), 600);
+        return;
+      }
+      // AI discards
+      setTimeout(() => {
+        const discard = AI.chooseDiscard(player, this.state.difficulty);
+        this.discardTile(playerIdx, discard);
+      }, 700 + Math.random() * 400);
+    }
+  },
+
+  /**
+   * Player (human or AI) discards a tile
+   */
+  discardTile(playerIdx, tile) {
+    const player = this.state.players[playerIdx];
+    const idx = player.hand.indexOf(tile);
+    if (idx < 0) return;
+
+    player.hand.splice(idx, 1);
+    player.discards.push(tile);
+    this.state.lastDiscard = tile;
+    this.state.lastDiscardPlayer = playerIdx;
+    this.state.pendingActions = null;
+    this.state.lastDrawWasGang = false;
+
+    Sound.discard();
+    UI.hideActions();
+    UI.hideHint();
+    UI.renderAll();
+    UI.highlightLastDiscard();
+
+    // Check if anyone can act on this discard (hu has priority, then peng/gang)
+    this.checkReactions(playerIdx, tile);
+  },
+
+  /**
+   * After a discard, check if any other player can hu / peng / gang
+   * Priority order: hu (any player) > peng/gang (specific player) > next player draws
+   */
+  checkReactions(discarderIdx, tile) {
+    // Check hu for all other players (blood battle: multiple can hu)
+    const huPlayers = [];
+    for (let i = 0; i < 4; i++) {
+      if (i === discarderIdx) continue;
+      if (this.state.players[i].hasHu) continue;
+      if (this.canPlayerHu(i, tile, false)) {
+        huPlayers.push(i);
+      }
+    }
+
+    // Check peng/gang (only next-in-line precedence but any player can peng)
+    const pengPlayers = [];
+    const gangPlayers = [];
+    for (let i = 0; i < 4; i++) {
+      if (i === discarderIdx) continue;
+      if (this.state.players[i].hasHu) continue;
+      const player = this.state.players[i];
+      if (Rules.canMingGang(player.hand, tile, player.missing)) {
+        gangPlayers.push(i);
+      } else if (Rules.canPeng(player.hand, tile, player.missing)) {
+        pengPlayers.push(i);
+      }
+    }
+
+    // If human can hu, prompt first
+    if (huPlayers.includes(0)) {
+      this.state.pendingActions = {
+        hu: true,
+        zimo: false,
+        winTile: tile,
+        fromPlayer: discarderIdx,
+        // Also keep peng/gang options open as alternatives
+        peng: pengPlayers.includes(0),
+        gang: gangPlayers.includes(0),
+        pass: true,
+      };
+      UI.showActions();
+      UI.showHint('可以胡牌！');
+      // AI players who can hu will be processed after human decides
+      return;
+    }
+
+    // If human can peng/gang, prompt
+    if (pengPlayers.includes(0) || gangPlayers.includes(0)) {
+      this.state.pendingActions = {
+        peng: pengPlayers.includes(0),
+        gang: gangPlayers.includes(0),
+        pass: true,
+        winTile: tile,
+        fromPlayer: discarderIdx,
+      };
+      UI.showActions();
+      // But: if AI can hu, they should hu first
+      if (huPlayers.length > 0) {
+        // Trigger AI hu after a beat (with priority)
+        setTimeout(() => this.processAiHuReactions(huPlayers, tile, discarderIdx), 300);
+        return;
+      }
+      return;
+    }
+
+    // No human reactions - process AI reactions
+    this.processAiReactions(huPlayers, pengPlayers, gangPlayers, tile, discarderIdx);
+  },
+
+  /**
+   * Handle AI hu reactions (multiple AIs can hu)
+   */
+  processAiHuReactions(huPlayers, tile, discarderIdx) {
+    let delay = 0;
+    for (const idx of huPlayers) {
+      if (idx === 0) continue; // human handled separately
+      const player = this.state.players[idx];
+      if (AI.shouldHu(player, tile, this.state.difficulty, { zimo: false })) {
+        setTimeout(() => this.declareHu(idx, tile, false, discarderIdx), 500 + delay);
+        delay += 700;
+      }
+    }
+    if (delay > 0) {
+      setTimeout(() => this.continueAfterReactions(discarderIdx), delay + 500);
+    } else {
+      this.continueAfterReactions(discarderIdx);
+    }
+  },
+
+  /**
+   * Process AI peng/gang reactions to a discard
+   */
+  processAiReactions(huPlayers, pengPlayers, gangPlayers, tile, discarderIdx) {
+    // AI hu first
+    const aiHu = huPlayers.filter(i => i !== 0);
+    if (aiHu.length > 0) {
+      this.processAiHuReactions(aiHu, tile, discarderIdx);
+      return;
+    }
+
+    // AI gang (priority over peng since it's stronger)
+    for (const idx of gangPlayers) {
+      if (idx === 0) continue;
+      const player = this.state.players[idx];
+      if (AI.shouldGang(player, tile, this.state.difficulty, false)) {
+        setTimeout(() => this.performMingGang(idx, tile, discarderIdx), 500);
+        return;
+      }
+    }
+
+    // AI peng
+    for (const idx of pengPlayers) {
+      if (idx === 0) continue;
+      const player = this.state.players[idx];
+      if (AI.shouldPeng(player, tile, this.state.difficulty)) {
+        setTimeout(() => this.performPeng(idx, tile, discarderIdx), 500);
+        return;
+      }
+    }
+
+    // No reactions - advance to next player
+    this.continueAfterReactions(discarderIdx);
+  },
+
+  continueAfterReactions(discarderIdx) {
+    if (this.state.phase === 'ended') return;
+    setTimeout(() => this.startTurn((discarderIdx + 1) % 4), 400);
+  },
+
+  /**
+   * Human action button handler
+   * action: 'pass' | 'peng' | 'gang' | 'hu'
+   */
+  action(action) {
+    // Route to online controller if in online mode
+    if (this.isOnline) {
+      OnlineGame.onAction(action);
+      return;
+    }
+
+    const pa = this.state.pendingActions;
+    if (!pa) return;
+
+    Sound.buttonClick();
+
+    if (action === 'pass') {
+      this.state.pendingActions = null;
+      UI.hideActions();
+      UI.hideHint();
+      // If we were prompted for a reaction to a discard, continue AI reactions then advance
+      if (pa.fromPlayer !== undefined) {
+        // Check if other AIs would have acted
+        const tile = pa.winTile;
+        const huPlayers = [];
+        const pengPlayers = [];
+        const gangPlayers = [];
+        for (let i = 1; i < 4; i++) {
+          if (this.state.players[i].hasHu) continue;
+          if (this.canPlayerHu(i, tile, false)) huPlayers.push(i);
+          else {
+            const player = this.state.players[i];
+            if (Rules.canMingGang(player.hand, tile, player.missing)) gangPlayers.push(i);
+            else if (Rules.canPeng(player.hand, tile, player.missing)) pengPlayers.push(i);
+          }
+        }
+        this.processAiReactions(huPlayers, pengPlayers, gangPlayers, tile, pa.fromPlayer);
+      } else {
+        // pass on own gang option - just discard normally (wait for click)
+      }
+      return;
+    }
+
+    if (action === 'hu') {
+      const tile = pa.winTile;
+      this.state.pendingActions = null;
+      UI.hideActions();
+      UI.hideHint();
+      this.declareHu(0, tile, pa.zimo, pa.fromPlayer);
+      return;
+    }
+
+    if (action === 'peng') {
+      const tile = pa.winTile;
+      const fromPlayer = pa.fromPlayer;
+      this.state.pendingActions = null;
+      UI.hideActions();
+      UI.hideHint();
+      this.performPeng(0, tile, fromPlayer);
+      return;
+    }
+
+    if (action === 'gang') {
+      // Could be ming-gang (from discard) or an-gang/add-gang (own turn)
+      if (pa.fromPlayer !== undefined) {
+        const tile = pa.winTile;
+        const fromPlayer = pa.fromPlayer;
+        this.state.pendingActions = null;
+        UI.hideActions();
+        UI.hideHint();
+        this.performMingGang(0, tile, fromPlayer);
+      } else if (pa.angangTiles && pa.angangTiles.length > 0) {
+        const tile = pa.angangTiles[0];
+        this.state.pendingActions = null;
+        UI.hideActions();
+        this.performAnGang(0, tile);
+      } else if (pa.addGangTiles && pa.addGangTiles.length > 0) {
+        const tile = pa.addGangTiles[0];
+        this.state.pendingActions = null;
+        UI.hideActions();
+        this.performAddGang(0, tile);
+      }
+      return;
+    }
+  },
+
+  /**
+   * Human clicked a tile in their hand - discard it
+   */
+  onHandTileClick(tile) {
+    // Route to online controller if in online mode
+    if (this.isOnline) {
+      OnlineGame.onHandTileClick(tile);
+      return;
+    }
+
+    if (this.state.currentTurn !== 0) return;
+    if (this.state.phase !== 'playing') return;
+    if (this.state.players[0].hasHu) return;
+    if (this.state.players[0].hand.length % 3 !== 2) return; // must have 14 tiles (or after gang draw)
+
+    const player = this.state.players[0];
+
+    // Sichuan rule: if you have any tiles of the missing suit, you MUST discard those first
+    const hasMissingTiles = player.hand.some(t => Tiles.suitOf(t) === player.missing);
+    if (hasMissingTiles && Tiles.suitOf(tile) !== player.missing) {
+      Sound.warning();
+      UI.toast(`必须先打出缺门（${Tiles.getSuitName(player.missing)}）的牌`, 'warning');
+      return;
+    }
+
+    // Clear pending pass-only action
+    if (this.state.pendingActions && !this.state.pendingActions.fromPlayer) {
+      this.state.pendingActions = null;
+      UI.hideActions();
+    }
+
+    this.discardTile(0, tile);
+  },
+
+  /**
+   * Check if a player can hu given a winning tile
+   */
+  canPlayerHu(playerIdx, winTile, isZimo) {
+    const player = this.state.players[playerIdx];
+    if (player.hasHu) return false;
+    if (Tiles.suitOf(winTile) === player.missing) return false;
+
+    // Build the test hand
+    let testHand;
+    if (isZimo) {
+      // Already in hand
+      testHand = player.hand.slice();
+    } else {
+      // Add the tile to hand
+      testHand = [...player.hand, winTile];
+    }
+
+    if (Rules.hasMissingSuit(testHand, player.melds, player.missing)) return false;
+    return Rules.canHu(testHand, player.melds);
+  },
+
+  /**
+   * Declare hu (win) for a player
+   */
+  declareHu(playerIdx, winTile, isZimo, fromPlayer = null) {
+    const player = this.state.players[playerIdx];
+
+    // Add the win tile to hand if from discard
+    let finalHand;
+    if (isZimo) {
+      finalHand = player.hand.slice();
+    } else {
+      finalHand = [...player.hand, winTile];
+      player.hand = finalHand;
+    }
+
+    const options = {
+      zimo: isZimo,
+      gangshanghua: this.state.lastDrawWasGang && isZimo,
+      haidi: this.state.wall.length === 0,
+    };
+
+    const result = Rules.calculateFan(finalHand, player.melds, winTile, options);
+
+    player.hasHu = true;
+    player.huInfo = {
+      tile: winTile,
+      zimo: isZimo,
+      fromPlayer,
+      fan: result.fan,
+      types: result.types,
+      score: result.score,
+    };
+
+    // Apply scoring: blood battle rules
+    // - Self-draw (zimo): each remaining active player pays the score
+    // - Discard (dianpao): only the discarder pays score
+    const activePlayers = this.state.players.filter((p, i) => !p.hasHu && i !== playerIdx);
+
+    if (isZimo) {
+      for (const other of activePlayers) {
+        other.score -= result.score;
+        player.score += result.score;
+      }
+    } else {
+      const discarder = this.state.players[fromPlayer];
+      if (discarder && !discarder.hasHu) {
+        discarder.score -= result.score;
+        player.score += result.score;
+      }
+    }
+
+    UI.showActionPopup('胡', playerIdx);
+    if (isZimo) {
+      Sound.zimo();
+    } else {
+      Sound.hu();
+    }
+    UI.toast(`${player.name} 胡牌！${result.types.map(t => t.name).join(' ')}`, 'success');
+    UI.renderAll();
+
+    // Check if game should end (only one active player left or wall empty)
+    setTimeout(() => {
+      const stillActive = this.state.players.filter(p => !p.hasHu);
+      if (stillActive.length <= 1 || this.state.wall.length === 0) {
+        this.endRound();
+      } else {
+        // Continue blood battle
+        if (isZimo) {
+          this.startTurn((playerIdx + 1) % 4);
+        } else {
+          this.continueAfterReactions(fromPlayer);
+        }
+      }
+    }, 1500);
+  },
+
+  /**
+   * Perform peng: take the discarded tile + 2 from hand → meld
+   */
+  performPeng(playerIdx, tile, fromPlayer) {
+    const player = this.state.players[playerIdx];
+    const discarder = this.state.players[fromPlayer];
+
+    // Remove tile from discarder's discards
+    const dIdx = discarder.discards.lastIndexOf(tile);
+    if (dIdx >= 0) discarder.discards.splice(dIdx, 1);
+
+    // Remove 2 copies from player's hand
+    let removed = 0;
+    player.hand = player.hand.filter(t => {
+      if (t === tile && removed < 2) { removed++; return false; }
+      return true;
+    });
+
+    player.melds.push({ type: 'peng', tile, from: fromPlayer });
+    this.state.lastDiscard = null;
+    this.state.currentTurn = playerIdx;
+
+    Sound.peng();
+    UI.showActionPopup('碰', playerIdx);
+    UI.renderAll();
+    UI.updateTurnIndicator(playerIdx);
+
+    // After peng, player must discard
+    if (playerIdx === 0) {
+      UI.showHint('请打出一张牌');
+    } else {
+      setTimeout(() => {
+        const discard = AI.chooseDiscard(player, this.state.difficulty);
+        this.discardTile(playerIdx, discard);
+      }, 800);
+    }
+  },
+
+  /**
+   * Perform ming-gang (exposed gang from discard)
+   */
+  performMingGang(playerIdx, tile, fromPlayer) {
+    const player = this.state.players[playerIdx];
+    const discarder = this.state.players[fromPlayer];
+
+    const dIdx = discarder.discards.lastIndexOf(tile);
+    if (dIdx >= 0) discarder.discards.splice(dIdx, 1);
+
+    let removed = 0;
+    player.hand = player.hand.filter(t => {
+      if (t === tile && removed < 3) { removed++; return false; }
+      return true;
+    });
+
+    player.melds.push({ type: 'gang', tile, from: fromPlayer });
+    this.state.lastDiscard = null;
+    this.state.currentTurn = playerIdx;
+
+    Sound.gang();
+    UI.showActionPopup('杠', playerIdx);
+    UI.renderAll();
+
+    // After gang: gang pays score (each opponent pays 1 to gang-er for ming gang in some rules)
+    // Simplified: ming gang +1 point from discarder
+    discarder.score -= 1;
+    player.score += 1;
+
+    // After gang, draw a replacement and continue turn
+    setTimeout(() => this.gangDraw(playerIdx), 800);
+  },
+
+  /**
+   * Perform an-gang (concealed gang from own hand)
+   */
+  performAnGang(playerIdx, tile) {
+    const player = this.state.players[playerIdx];
+    player.hand = player.hand.filter(t => t !== tile);
+    player.melds.push({ type: 'angang', tile });
+
+    Sound.gang();
+    UI.showActionPopup('暗杠', playerIdx);
+    UI.renderAll();
+
+    // An-gang: each other active player pays 2
+    const others = this.state.players.filter((p, i) => !p.hasHu && i !== playerIdx);
+    for (const other of others) {
+      other.score -= 2;
+      player.score += 2;
+    }
+
+    setTimeout(() => this.gangDraw(playerIdx), 800);
+  },
+
+  /**
+   * Perform added gang (peng → gang by drawing the 4th)
+   */
+  performAddGang(playerIdx, tile) {
+    const player = this.state.players[playerIdx];
+    // Find the peng meld and upgrade it
+    const meld = player.melds.find(m => m.type === 'peng' && m.tile === tile);
+    if (!meld) return;
+    meld.type = 'gang';
+    player.hand = Tiles.removeOne(player.hand, tile);
+
+    Sound.gang();
+    UI.showActionPopup('杠', playerIdx);
+    UI.renderAll();
+
+    // Each opponent pays 1
+    const others = this.state.players.filter((p, i) => !p.hasHu && i !== playerIdx);
+    for (const other of others) {
+      other.score -= 1;
+      player.score += 1;
+    }
+
+    setTimeout(() => this.gangDraw(playerIdx), 800);
+  },
+
+  /**
+   * Draw a replacement tile after a gang
+   */
+  gangDraw(playerIdx) {
+    if (this.state.wall.length === 0) {
+      this.endRound();
+      return;
+    }
+    const player = this.state.players[playerIdx];
+    const tile = this.state.wall.shift();
+    player.hand.push(tile);
+    player.hand = Tiles.sortHand(player.hand);
+    this.state.lastDrawWasGang = true;
+
+    UI.renderAll();
+
+    // Check for self-draw hu (gangshanghua)
+    if (this.canPlayerHu(playerIdx, tile, true)) {
+      if (playerIdx === 0) {
+        this.state.pendingActions = { hu: true, zimo: true, winTile: tile, pass: true };
+        UI.showActions();
+        UI.showHint('杠上花！可胡牌');
+        return;
+      } else {
+        if (AI.shouldHu(player, tile, this.state.difficulty, { zimo: true, gangshanghua: true })) {
+          setTimeout(() => this.declareHu(playerIdx, tile, true), 600);
+          return;
+        }
+      }
+    }
+
+    // Check for more gang opportunities
+    const angangTiles = Rules.findAnGang(player.hand, player.missing);
+    const addGangTiles = Rules.findAddGang(player.hand, player.melds, player.missing);
+
+    if (playerIdx === 0) {
+      if (angangTiles.length > 0 || addGangTiles.length > 0) {
+        this.state.pendingActions = { gang: true, angangTiles, addGangTiles, pass: true };
+        UI.showActions();
+      }
+    } else {
+      if (angangTiles.length > 0 && AI.shouldGang(player, angangTiles[0], this.state.difficulty, true)) {
+        setTimeout(() => this.performAnGang(playerIdx, angangTiles[0]), 600);
+        return;
+      }
+      if (addGangTiles.length > 0 && AI.shouldGang(player, addGangTiles[0], this.state.difficulty, false)) {
+        setTimeout(() => this.performAddGang(playerIdx, addGangTiles[0]), 600);
+        return;
+      }
+      // AI discards
+      setTimeout(() => {
+        const discard = AI.chooseDiscard(player, this.state.difficulty);
+        this.discardTile(playerIdx, discard);
+      }, 800);
+    }
+  },
+
+  /**
+   * End the round and show results
+   */
+  endRound() {
+    this.state.phase = 'ended';
+    Sound.roundEnd();
+
+    // Apply "查叫" rule: at end of round, players still playing (no hu) who are ting
+    // get partial compensation, those not ting pay penalty (simplified version)
+    // For now, just show final scores.
+
+    UI.showResults();
+  },
+
+  /**
+   * Start next round
+   */
+  nextRound() {
+    UI.closeModal('result-modal');
+    // In online mode, returning to lobby (host will start next round)
+    if (this.isOnline) {
+      UI.toast('等待房主开始下一局...', 'info');
+      return;
+    }
+    const prevScores = this.state.players.map(p => p.score);
+    const difficulty = this.state.difficulty;
+    const round = this.state.round + 1;
+    this.state = this.createInitialState(difficulty);
+    this.state.round = round;
+    // Carry over scores
+    for (let i = 0; i < 4; i++) {
+      this.state.players[i].score = prevScores[i];
+    }
+    this.dealInitialHands();
+    UI.renderAll();
+    setTimeout(() => UI.showMissingOverlay(), 600);
+  },
+
+  /**
+   * Helper: get all discarded tiles across all players
+   */
+  getAllDiscards() {
+    if (!this.state) return [];
+    return this.state.players.flatMap(p => p.discards);
+  },
+};
+
+// ========== ui.js ==========
+/* ============================================
+   UI MODULE
+   All DOM rendering and user interactions
+   ============================================ */
+
+const UI = {
+
+  soundEnabled: true,
+
+  /**
+   * Switch between top-level screens
+   */
+  showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+  },
+
+  showDifficulty() {
+    Sound.init();
+    Sound.buttonClick();
+    document.getElementById('difficulty-modal').classList.add('active');
+  },
+
+  showRules() {
+    Sound.buttonClick();
+    document.getElementById('rules-modal').classList.add('active');
+  },
+
+  showPauseMenu() {
+    Sound.buttonClick();
+    document.getElementById('pause-modal').classList.add('active');
+  },
+
+  closeModal(id) {
+    Sound.buttonClick();
+    document.getElementById(id).classList.remove('active');
+  },
+
+  returnToMenu() {
+    document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+    this.showScreen('main-menu');
+    Game.state = null;
+    Game.isOnline = false;
+    // Disconnect from server if online
+    if (typeof Online !== 'undefined' && Online.connected) {
+      Online.disconnect();
+    }
+    this.setConnectionStatus(false);
+  },
+
+  /**
+   * Show/hide and update the connection status indicator
+   */
+  setConnectionStatus(connected) {
+    const el = document.getElementById('conn-status');
+    if (!el) return;
+    const text = document.getElementById('conn-status-text');
+    if (!Game.isOnline) {
+      el.classList.remove('visible');
+      return;
+    }
+    el.classList.add('visible');
+    if (connected) {
+      el.classList.remove('disconnected');
+      if (text) text.textContent = '已连接';
+    } else {
+      el.classList.add('disconnected');
+      if (text) text.textContent = '重连中…';
+    }
+  },
+
+  toggleSound() {
+    this.soundEnabled = !this.soundEnabled;
+    Sound.setEnabled(this.soundEnabled);
+    this.toast(this.soundEnabled ? '音效已开启' : '音效已关闭');
+    if (this.soundEnabled) Sound.buttonClick();
+    // Update sound icon
+    this.updateSoundIcon();
+  },
+
+  updateSoundIcon() {
+    const btns = document.querySelectorAll('.icon-btn');
+    btns.forEach(btn => {
+      const svg = btn.querySelector('svg path');
+      if (svg && svg.getAttribute('d') && svg.getAttribute('d').includes('M3 9v6h4l5')) {
+        // This is the sound button - update icon
+        if (this.soundEnabled) {
+          svg.setAttribute('d', 'M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z');
+        } else {
+          // Muted icon
+          svg.setAttribute('d', 'M16.5 12A4.5 4.5 0 0 0 14 7.97v2.21l2.45 2.45c.03-.2.05-.41.05-.63zM19 12c0 .94-.2 1.82-.54 2.64l1.51 1.51A8.96 8.96 0 0 0 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06a8.99 8.99 0 0 0 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z');
+        }
+      }
+    });
+  },
+
+  showMissingOverlay() {
+    document.getElementById('missing-overlay').classList.add('active');
+  },
+
+  hideMissingOverlay() {
+    document.getElementById('missing-overlay').classList.remove('active');
+  },
+
+  /**
+   * Show a toast notification
+   */
+  toast(message, type = 'info') {
+    const container = document.getElementById('toast');
+    const el = document.createElement('div');
+    el.className = 'toast-item ' + type;
+    el.textContent = message;
+    container.appendChild(el);
+    setTimeout(() => el.remove(), 3000);
+  },
+
+  /**
+   * Display a hint at the bottom of the screen
+   */
+  showHint(text) {
+    const el = document.getElementById('hint');
+    el.textContent = text;
+    el.classList.add('visible');
+  },
+
+  hideHint() {
+    document.getElementById('hint').classList.remove('visible');
+  },
+
+  /**
+   * Animate the action popup (碰/杠/胡)
+   */
+  showActionPopup(text, playerIdx) {
+    const center = document.querySelector('.table-center');
+    const el = document.createElement('div');
+    el.className = 'action-popup';
+    el.textContent = text;
+    center.appendChild(el);
+    setTimeout(() => el.remove(), 1200);
+  },
+
+  /**
+   * Show action buttons based on pendingActions
+   */
+  showActions() {
+    const pa = Game.state.pendingActions;
+    if (!pa) return;
+    const passBtn = document.getElementById('btn-pass');
+    const pengBtn = document.getElementById('btn-peng');
+    const gangBtn = document.getElementById('btn-gang');
+    const huBtn = document.getElementById('btn-hu');
+
+    passBtn.classList.toggle('visible', !!pa.pass);
+    pengBtn.classList.toggle('visible', !!pa.peng);
+    gangBtn.classList.toggle('visible', !!pa.gang);
+    huBtn.classList.toggle('visible', !!pa.hu);
+  },
+
+  hideActions() {
+    document.querySelectorAll('.action-btn').forEach(btn => btn.classList.remove('visible'));
+  },
+
+  /**
+   * Update turn indicator
+   */
+  updateTurnIndicator(playerIdx) {
+    // Remove turn class from all
+    for (let i = 0; i < 4; i++) {
+      const el = document.getElementById('player-' + i);
+      if (el) el.classList.remove('turn');
+    }
+    const el = document.getElementById('player-' + playerIdx);
+    if (el) el.classList.add('turn');
+
+    const indicator = document.getElementById('turn-indicator');
+    if (playerIdx === 0) {
+      indicator.textContent = '轮到你';
+    } else {
+      indicator.textContent = Game.state.players[playerIdx].name + ' 出牌中…';
+    }
+  },
+
+  /**
+   * Highlight the last discarded tile briefly
+   */
+  highlightLastDiscard() {
+    const player = Game.state.lastDiscardPlayer;
+    if (player < 0) return;
+    const container = document.getElementById('discards-' + player);
+    if (!container) return;
+    const tiles = container.querySelectorAll('.tile');
+    if (tiles.length > 0) {
+      const last = tiles[tiles.length - 1];
+      last.classList.add('last-discard-hl');
+      setTimeout(() => last.classList.remove('last-discard-hl'), 1500);
+    }
+  },
+
+  /**
+   * Render everything
+   */
+  renderAll() {
+    if (!Game.state) return;
+
+    this.renderWallCount();
+    for (let i = 0; i < 4; i++) {
+      this.renderPlayer(i);
+    }
+    this.renderTopBar();
+  },
+
+  renderTopBar() {
+    document.getElementById('tiles-remaining').textContent = Game.state.wall.length;
+    document.getElementById('round-number').textContent = Game.state.round;
+  },
+
+  renderWallCount() {
+    document.getElementById('wall-count').textContent = Game.state.wall.length;
+  },
+
+  /**
+   * Render a single player's hand, melds, discards, info
+   */
+  renderPlayer(idx) {
+    const player = Game.state.players[idx];
+    const isHuman = idx === 0;
+
+    // Update missing-suit label
+    const missingEl = document.getElementById('missing-' + idx);
+    if (missingEl) {
+      missingEl.textContent = player.missing ? '缺' + Tiles.getSuitName(player.missing) : '';
+    }
+
+    // Update score
+    const scoreEl = document.getElementById('score-' + idx);
+    if (scoreEl) {
+      const score = player.score;
+      scoreEl.textContent = (score >= 0 ? '+' : '') + score;
+      scoreEl.style.color = score > 0 ? '#6cd99f' : score < 0 ? '#ff8d8a' : 'var(--gold-bright)';
+    }
+
+    // Mark hu state
+    const playerEl = document.getElementById('player-' + idx);
+    if (playerEl) {
+      playerEl.classList.toggle('hu', player.hasHu);
+    }
+
+    // Render hand
+    this.renderHand(idx, player, isHuman);
+
+    // Render melds
+    this.renderMelds(idx, player);
+
+    // Render discards
+    this.renderDiscards(idx, player);
+  },
+
+  renderHand(idx, player, isHuman) {
+    const container = document.getElementById('hand-' + idx);
+    if (!container) return;
+    container.innerHTML = '';
+
+    if (isHuman) {
+      // Render face-up tiles, clickable
+      const isMyTurn = Game.state.currentTurn === 0 && Game.state.phase === 'playing' && !player.hasHu;
+      const canDiscard = isMyTurn && player.hand.length % 3 === 2;
+
+      // Sichuan rule: if hand contains missing-suit tiles, ONLY those are discardable
+      const hasMissingTiles = canDiscard && player.missing &&
+        player.hand.some(t => Tiles.suitOf(t) === player.missing);
+
+      const tingTiles = Rules.isTing(player.hand, player.melds, player.missing)
+        ? Rules.findTingTiles(player.hand, player.melds, player.missing)
+        : [];
+
+      for (const tile of player.hand) {
+        const isMissingTile = Tiles.suitOf(tile) === player.missing;
+        // Tile is clickable only if it's our turn AND (no missing tiles in hand, or this IS a missing tile)
+        const tileClickable = canDiscard && (!hasMissingTiles || isMissingTile);
+        const disabled = !canDiscard || (hasMissingTiles && !isMissingTile);
+
+        const tileEl = Tiles.renderTile(tile, {
+          clickable: tileClickable,
+          disabled,
+          onClick: tileClickable ? (t) => Game.onHandTileClick(t) : null,
+        });
+
+        // Mark missing-suit tiles with a subtle warning style
+        if (isMissingTile && canDiscard) {
+          tileEl.classList.add('must-discard');
+        }
+        container.appendChild(tileEl);
+      }
+
+      // Show ting hint
+      if (tingTiles.length > 0 && player.missing) {
+        const hint = document.getElementById('hint');
+        if (Game.state.phase === 'playing' && !player.hasHu) {
+          const tingDisplay = tingTiles.map(t => {
+            const { num, suit } = Tiles.getDisplay(t);
+            return num + suit;
+          }).join(' ');
+          // Don't overwrite if hint is showing for action
+          if (!hint.classList.contains('visible') || hint.textContent.includes('听')) {
+            hint.textContent = '听牌: ' + tingDisplay;
+            hint.classList.add('visible');
+          }
+        }
+      }
+    } else {
+      // Render face-down tiles for opponents
+      // EXCEPTION: if player has hu'd, reveal their hand
+      const vertical = idx === 1 || idx === 3;
+      if (player.hasHu && player.hand.length > 0 && player.hand.every(t => t !== '?')) {
+        // Reveal face-up
+        for (const tile of player.hand) {
+          const tileEl = Tiles.renderTile(tile, { small: true });
+          container.appendChild(tileEl);
+        }
+      } else {
+        for (const _ of player.hand) {
+          container.appendChild(Tiles.renderBack(vertical));
+        }
+      }
+    }
+  },
+
+  renderMelds(idx, player) {
+    const container = document.getElementById('melds-' + idx);
+    if (!container) return;
+    container.innerHTML = '';
+    for (const meld of player.melds) {
+      container.appendChild(Tiles.renderMeld(meld));
+    }
+  },
+
+  renderDiscards(idx, player) {
+    const container = document.getElementById('discards-' + idx);
+    if (!container) return;
+    container.innerHTML = '';
+    for (const tile of player.discards) {
+      container.appendChild(Tiles.renderTile(tile, { small: true }));
+    }
+  },
+
+  /**
+   * Show round results
+   */
+  showResults() {
+    const modal = document.getElementById('result-modal');
+    const list = document.getElementById('result-list');
+    const title = document.getElementById('result-title');
+
+    list.innerHTML = '';
+
+    // Find winners and losers
+    const winners = Game.state.players.filter(p => p.hasHu);
+    const losers = Game.state.players.filter(p => !p.hasHu);
+
+    if (winners.length === 0) {
+      title.textContent = '荒庄';
+    } else {
+      title.textContent = '本局结算';
+    }
+
+    // Show all players sorted by score
+    const sorted = [...Game.state.players].sort((a, b) => b.score - a.score);
+    for (const player of sorted) {
+      const row = document.createElement('div');
+      row.className = 'result-row';
+      if (player.hasHu) row.classList.add('winner');
+      else row.classList.add('loser');
+
+      const types = player.huInfo
+        ? player.huInfo.types.map(t => t.name).join('·') + ` (${player.huInfo.fan}番)`
+        : (player === sorted[sorted.length - 1] && losers.includes(player) ? '未胡' : '');
+
+      const scoreClass = player.score >= 0 ? 'positive' : 'negative';
+      const scoreStr = (player.score >= 0 ? '+' : '') + player.score;
+
+      row.innerHTML = `
+        <span class="result-name">${player.name}</span>
+        <span class="result-types">${types}</span>
+        <span class="result-score ${scoreClass}">${scoreStr}</span>
+      `;
+      list.appendChild(row);
+    }
+
+    modal.classList.add('active');
+  },
+};
+
+// ============================================
+// Initial setup on page load
+// ============================================
+window.addEventListener('DOMContentLoaded', () => {
+  UI.showScreen('main-menu');
+  // Initialize online module handlers
+  if (typeof OnlineGame !== 'undefined') {
+    OnlineGame.init();
+  }
+  // Update connection status indicator on online events
+  if (typeof Online !== 'undefined') {
+    Online.on('disconnect', () => UI.setConnectionStatus(false));
+    Online.on('hello', () => UI.setConnectionStatus(true));
+    Online.on('reconnected', () => UI.setConnectionStatus(true));
+  }
+});
+
+// ========== online.js ==========
+/* ============================================
+   ONLINE MODULE
+   WebSocket client + protocol handling
+   ============================================ */
+
+const Online = {
+
+  ws: null,
+  connected: false,
+  serverUrl: null,
+
+  // Player identity
+  playerName: '玩家',
+  roomCode: null,
+  mySeat: -1,
+  myToken: null,
+  isHost: false,
+
+  // Reconnect support
+  reconnectAttempts: 0,
+  maxReconnectAttempts: 5,
+  reconnectTimer: null,
+
+  // Message handlers
+  handlers: {},
+
+  /**
+   * Resolve server URL from current page
+   * If served from http(s)://host, use ws(s)://host
+   */
+  getServerUrl(custom = null) {
+    if (custom) return custom;
+    const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    return `${proto}//${window.location.host}`;
+  },
+
+  /**
+   * Connect to the server
+   */
+  connect(url, name) {
+    this.serverUrl = this.getServerUrl(url);
+    this.playerName = name || '玩家';
+
+    return new Promise((resolve, reject) => {
+      try {
+        this.ws = new WebSocket(this.serverUrl);
+      } catch (e) {
+        return reject(e);
+      }
+
+      const timer = setTimeout(() => {
+        reject(new Error('connection-timeout'));
+        try { this.ws.close(); } catch {}
+      }, 8000);
+
+      this.ws.onopen = () => {
+        clearTimeout(timer);
+        this.connected = true;
+        this.reconnectAttempts = 0;
+        console.log('[Online] Connected to', this.serverUrl);
+        resolve();
+      };
+
+      this.ws.onmessage = (e) => {
+        let msg;
+        try { msg = JSON.parse(e.data); } catch { return; }
+        this.handleMessage(msg);
+      };
+
+      this.ws.onerror = (e) => {
+        console.error('[Online] WebSocket error', e);
+      };
+
+      this.ws.onclose = () => {
+        this.connected = false;
+        console.log('[Online] Disconnected');
+        this.emit('disconnect');
+        // Auto-reconnect if we had a room
+        if (this.roomCode && this.myToken && this.reconnectAttempts < this.maxReconnectAttempts) {
+          this.scheduleReconnect();
+        }
+      };
+    });
+  },
+
+  /**
+   * Schedule a reconnect attempt
+   */
+  scheduleReconnect() {
+    if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
+    this.reconnectAttempts++;
+    const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 10000);
+    console.log(`[Online] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`);
+    this.reconnectTimer = setTimeout(() => {
+      this.connect(this.serverUrl, this.playerName).then(() => {
+        // After reconnecting, try to resume
+        this.send({
+          type: 'reconnect',
+          code: this.roomCode,
+          token: this.myToken,
+        });
+      }).catch(() => {
+        if (this.reconnectAttempts < this.maxReconnectAttempts) {
+          this.scheduleReconnect();
+        }
+      });
+    }, delay);
+  },
+
+  /**
+   * Send a message
+   */
+  send(msg) {
+    if (!this.connected || !this.ws || this.ws.readyState !== 1) {
+      console.warn('[Online] Cannot send - not connected');
+      return false;
+    }
+    try {
+      this.ws.send(JSON.stringify(msg));
+      return true;
+    } catch (e) {
+      console.error('[Online] Send error', e);
+      return false;
+    }
+  },
+
+  /**
+   * Disconnect cleanly
+   */
+  disconnect() {
+    if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
+    this.reconnectAttempts = this.maxReconnectAttempts; // prevent auto-reconnect
+    if (this.ws) {
+      try { this.ws.close(); } catch {}
+    }
+    this.ws = null;
+    this.connected = false;
+    this.roomCode = null;
+    this.myToken = null;
+    this.mySeat = -1;
+  },
+
+  /**
+   * Subscribe to a server message type
+   */
+  on(type, handler) {
+    if (!this.handlers[type]) this.handlers[type] = [];
+    this.handlers[type].push(handler);
+  },
+
+  /**
+   * Emit local event to subscribers
+   */
+  emit(type, data) {
+    const handlers = this.handlers[type];
+    if (handlers) {
+      for (const h of handlers) {
+        try { h(data); } catch (e) { console.error('Handler error:', e); }
+      }
+    }
+  },
+
+  /**
+   * Master message dispatcher
+   */
+  handleMessage(msg) {
+    console.log('[Online] <<', msg.type, msg);
+
+    // Track session info
+    if (msg.type === 'room-joined' || msg.type === 'reconnected') {
+      this.roomCode = msg.code;
+      this.mySeat = msg.seat;
+      this.myToken = msg.token || this.myToken;
+      this.isHost = !!msg.isHost;
+    }
+
+    this.emit(msg.type, msg);
+  },
+
+  // ============================================
+  // High-level API
+  // ============================================
+
+  createRoom(options = {}) {
+    return this.send({
+      type: 'create-room',
+      name: this.playerName,
+      options,
+    });
+  },
+
+  joinRoom(code) {
+    return this.send({
+      type: 'join-room',
+      code,
+      name: this.playerName,
+    });
+  },
+
+  leaveRoom() {
+    this.send({ type: 'leave-room' });
+    this.roomCode = null;
+    this.myToken = null;
+    this.mySeat = -1;
+  },
+
+  startGame() {
+    return this.send({ type: 'start-game' });
+  },
+
+  chooseMissing(suit) {
+    return this.send({ type: 'choose-missing', suit });
+  },
+
+  discard(tile) {
+    return this.send({ type: 'discard', tile });
+  },
+
+  reaction(action) {
+    return this.send({ type: 'reaction', action });
+  },
+
+  anGang(tile) {
+    return this.send({ type: 'angang', tile });
+  },
+
+  addGang(tile) {
+    return this.send({ type: 'add-gang', tile });
+  },
+
+  /**
+   * Declare self-draw win
+   */
+  zimo() {
+    return this.send({ type: 'zimo' });
+  },
+
+  chat(text, quick = false) {
+    return this.send({ type: 'chat', text, quick });
+  },
+};
+
+// ========== online-game.js ==========
+/* ============================================
+   ONLINE GAME CONTROLLER
+   Bridges server messages to local UI state.
+   Reuses Game.state structure so UI module works unchanged.
+   ============================================ */
+
+const OnlineGame = {
+
+  // Will be set when entering a room
+  active: false,
+
+  // Game state mirrored from server (compatible with Game.state shape)
+  state: null,
+
+  // The seat indexes used by the UI (0=me, 1=right, 2=top, 3=left)
+  // Server uses absolute seats; we need to rotate so server.mySeat becomes UI 0
+  seatRotation: 0,
+
+  /**
+   * Convert server-side seat to UI seat (0..3, where 0 is always "me")
+   */
+  toUiSeat(serverSeat) {
+    return (serverSeat - this.seatRotation + 4) % 4;
+  },
+
+  /**
+   * Convert UI seat to server-side seat
+   */
+  toServerSeat(uiSeat) {
+    return (uiSeat + this.seatRotation) % 4;
+  },
+
+  /**
+   * Initialize handlers - called once when the app starts
+   */
+  init() {
+    Online.on('hello', (msg) => {
+      console.log('Server version:', msg.serverVersion);
+    });
+
+    Online.on('error', (msg) => {
+      UI.toast('错误：' + this.translateError(msg.error), 'error');
+    });
+
+    Online.on('room-joined', (msg) => {
+      this.seatRotation = msg.seat;
+      OnlineLobby.onRoomJoined(msg);
+    });
+
+    Online.on('player-joined', (msg) => {
+      OnlineLobby.onPlayerJoined(msg);
+    });
+
+    Online.on('player-left', (msg) => {
+      OnlineLobby.onPlayerLeft(msg);
+    });
+
+    Online.on('player-offline', (msg) => {
+      UI.toast(`座位 ${this.toUiSeat(msg.seat)} 离线`, 'warning');
+    });
+
+    Online.on('player-online', (msg) => {
+      UI.toast(`座位 ${this.toUiSeat(msg.seat)} 重新连接`, 'success');
+    });
+
+    Online.on('game-started', (msg) => {
+      this.startGame(msg);
+    });
+
+    Online.on('missing-chosen', (msg) => {
+      // Another player chose their missing - just update UI
+      if (msg.seat !== Online.mySeat) {
+        const uiSeat = this.toUiSeat(msg.seat);
+        UI.toast(`${this.state.players[uiSeat].name} 已定缺`, 'info');
+      }
+    });
+
+    Online.on('all-missings-chosen', (msg) => {
+      // Reveal all missings
+      for (const m of msg.missings) {
+        const uiSeat = this.toUiSeat(m.seat);
+        this.state.players[uiSeat].missing = m.missing;
+      }
+      this.state.phase = 'playing';
+      UI.renderAll();
+      Sound.missingSelect();
+    });
+
+    Online.on('your-draw', (msg) => {
+      // My turn - server sent me the tile
+      const myPlayer = this.state.players[0];
+      myPlayer.hand.push(msg.tile);
+      myPlayer.hand = Tiles.sortHand(myPlayer.hand);
+      this.state.wall = new Array(msg.wallCount).fill('?'); // placeholder
+      this.state.currentTurn = 0;
+      Sound.draw();
+      Sound.yourTurn();
+      UI.renderAll();
+      UI.updateTurnIndicator(0);
+
+      // Show action options
+      const pa = { pass: true };
+      if (msg.options.zimo) pa.hu = true, pa.zimo = true, pa.winTile = msg.tile;
+      if (msg.options.angang && msg.options.angang.length > 0) {
+        pa.gang = true;
+        pa.angangTiles = msg.options.angang;
+      }
+      if (msg.options.addGang && msg.options.addGang.length > 0) {
+        pa.gang = true;
+        pa.addGangTiles = msg.options.addGang;
+      }
+      if (pa.hu || pa.gang) {
+        this.state.pendingActions = pa;
+        UI.showActions();
+      }
+    });
+
+    Online.on('gang-draw', (msg) => {
+      // After my gang, I get a replacement tile
+      const myPlayer = this.state.players[0];
+      myPlayer.hand.push(msg.tile);
+      myPlayer.hand = Tiles.sortHand(myPlayer.hand);
+      this.state.wall = new Array(msg.wallCount).fill('?');
+      Sound.draw();
+      UI.renderAll();
+
+      const pa = { pass: true };
+      if (msg.options.zimo) pa.hu = true, pa.zimo = true, pa.winTile = msg.tile;
+      if (msg.options.angang && msg.options.angang.length > 0) {
+        pa.gang = true;
+        pa.angangTiles = msg.options.angang;
+      }
+      if (msg.options.addGang && msg.options.addGang.length > 0) {
+        pa.gang = true;
+        pa.addGangTiles = msg.options.addGang;
+      }
+      if (pa.hu || pa.gang) {
+        this.state.pendingActions = pa;
+        UI.showActions();
+      }
+    });
+
+    Online.on('turn-changed', (msg) => {
+      // Another player drew (or our turn changed)
+      const uiSeat = this.toUiSeat(msg.seat);
+      const player = this.state.players[uiSeat];
+      // Increase opponent's hand count by 1 (face-down)
+      if (uiSeat !== 0) {
+        player.hand.push('?'); // placeholder
+      }
+      this.state.wall = new Array(msg.wallCount).fill('?');
+      this.state.currentTurn = uiSeat;
+      Sound.draw();
+      UI.renderAll();
+      UI.updateTurnIndicator(uiSeat);
+    });
+
+    Online.on('discard', (msg) => {
+      const uiSeat = this.toUiSeat(msg.seat);
+      const player = this.state.players[uiSeat];
+
+      // If it was an opponent, remove a face-down tile from their hand
+      if (uiSeat !== 0) {
+        const idx = player.hand.lastIndexOf('?');
+        if (idx >= 0) player.hand.splice(idx, 1);
+      } else {
+        // It was me - remove the actual tile
+        const idx = player.hand.indexOf(msg.tile);
+        if (idx >= 0) player.hand.splice(idx, 1);
+      }
+
+      player.discards.push(msg.tile);
+      this.state.lastDiscard = msg.tile;
+      this.state.lastDiscardPlayer = uiSeat;
+      Sound.discard();
+      UI.renderAll();
+      UI.highlightLastDiscard();
+      UI.hideActions();
+    });
+
+    Online.on('reaction-prompt', (msg) => {
+      // I have options to react to a discard
+      const pa = {
+        pass: true,
+        fromPlayer: this.toUiSeat(msg.fromSeat),
+        winTile: msg.tile,
+      };
+      if (msg.options.includes('hu')) pa.hu = true;
+      if (msg.options.includes('peng')) pa.peng = true;
+      if (msg.options.includes('gang')) pa.gang = true;
+      this.state.pendingActions = pa;
+      UI.showActions();
+      if (pa.hu) UI.showHint('可以胡牌！');
+    });
+
+    Online.on('peng', (msg) => {
+      this.handleMeld('peng', msg);
+    });
+
+    Online.on('gang', (msg) => {
+      this.handleMeld('gang', msg);
+    });
+
+    Online.on('your-turn-discard', () => {
+      // After peng, I must discard
+      this.state.currentTurn = 0;
+      UI.showHint('请打出一张牌');
+      UI.renderAll();
+    });
+
+    Online.on('hu', (msg) => {
+      const uiSeat = this.toUiSeat(msg.seat);
+      const player = this.state.players[uiSeat];
+      player.hasHu = true;
+      player.huInfo = {
+        tile: msg.tile,
+        zimo: msg.zimo,
+        fromPlayer: msg.fromSeat !== null ? this.toUiSeat(msg.fromSeat) : null,
+        types: msg.types,
+        fan: msg.fan,
+        score: msg.score,
+      };
+      // Update hand & melds from server data
+      if (uiSeat === 0) {
+        player.hand = msg.hand;
+      } else {
+        player.hand = msg.hand; // reveal
+      }
+      player.melds = msg.melds;
+
+      // Apply score changes (server already calculated)
+      // Note: score deltas are applied on round-end message
+
+      UI.showActionPopup('胡', uiSeat);
+      if (msg.zimo) Sound.zimo(); else Sound.hu();
+      UI.toast(`${player.name} 胡牌！${msg.types.map(t => t.name).join(' ')}`, 'success');
+      UI.renderAll();
+      UI.hideActions();
+    });
+
+    Online.on('round-end', (msg) => {
+      // Update final scores
+      for (const p of msg.players) {
+        const uiSeat = this.toUiSeat(p.seat);
+        this.state.players[uiSeat].score = msg.totalScores[p.seat];
+        this.state.players[uiSeat].hasHu = p.hasHu;
+        if (p.huInfo) {
+          this.state.players[uiSeat].huInfo = {
+            ...p.huInfo,
+            types: p.huInfo.types,
+          };
+        }
+      }
+      this.state.phase = 'ended';
+      this.state.round = msg.round;
+      Sound.roundEnd();
+      UI.showResults();
+    });
+
+    Online.on('game-over', (msg) => {
+      UI.toast('整局游戏结束！', 'success');
+    });
+
+    Online.on('chat', (msg) => {
+      const uiSeat = this.toUiSeat(msg.seat);
+      const name = this.state ? this.state.players[uiSeat].name : '玩家';
+      UI.toast(`${name}: ${msg.text}`, 'info');
+    });
+
+    Online.on('reconnected', (msg) => {
+      this.seatRotation = msg.seat;
+      if (msg.gameView) {
+        this.rebuildStateFromView(msg.gameView, msg.players);
+        UI.showScreen('game-screen');
+        UI.renderAll();
+      }
+      UI.toast('已重新连接', 'success');
+    });
+
+    Online.on('disconnect', () => {
+      UI.toast('连接已断开，正在重连...', 'warning');
+    });
+  },
+
+  handleMeld(type, msg) {
+    const uiSeat = this.toUiSeat(msg.seat);
+    const player = this.state.players[uiSeat];
+
+    if (type === 'peng') {
+      if (uiSeat !== 0) {
+        // Remove 2 placeholders from opponent's hand
+        for (let i = 0; i < 2; i++) {
+          const idx = player.hand.lastIndexOf('?');
+          if (idx >= 0) player.hand.splice(idx, 1);
+        }
+      } else {
+        // Remove 2 actual tiles
+        let removed = 0;
+        player.hand = player.hand.filter(t => {
+          if (t === msg.tile && removed < 2) { removed++; return false; }
+          return true;
+        });
+      }
+      player.melds.push({ type: 'peng', tile: msg.tile });
+
+      // Also remove from discarder's discards (server keeps state, but we mirror)
+      const fromUiSeat = this.toUiSeat(msg.fromSeat);
+      const fromPlayer = this.state.players[fromUiSeat];
+      const dIdx = fromPlayer.discards.lastIndexOf(msg.tile);
+      if (dIdx >= 0) fromPlayer.discards.splice(dIdx, 1);
+
+      Sound.peng();
+      UI.showActionPopup('碰', uiSeat);
+    } else if (type === 'gang') {
+      const kind = msg.kind;
+      if (kind === 'an') {
+        // Concealed gang - remove 4 tiles
+        if (uiSeat !== 0) {
+          for (let i = 0; i < 4; i++) {
+            const idx = player.hand.lastIndexOf('?');
+            if (idx >= 0) player.hand.splice(idx, 1);
+          }
+        } else {
+          player.hand = player.hand.filter(t => t !== msg.tile);
+        }
+        player.melds.push({ type: 'angang', tile: msg.tile });
+      } else if (kind === 'ming') {
+        if (uiSeat !== 0) {
+          for (let i = 0; i < 3; i++) {
+            const idx = player.hand.lastIndexOf('?');
+            if (idx >= 0) player.hand.splice(idx, 1);
+          }
+        } else {
+          let removed = 0;
+          player.hand = player.hand.filter(t => {
+            if (t === msg.tile && removed < 3) { removed++; return false; }
+            return true;
+          });
+        }
+        player.melds.push({ type: 'gang', tile: msg.tile });
+        if (msg.fromSeat !== undefined) {
+          const fromUiSeat = this.toUiSeat(msg.fromSeat);
+          const fromPlayer = this.state.players[fromUiSeat];
+          const dIdx = fromPlayer.discards.lastIndexOf(msg.tile);
+          if (dIdx >= 0) fromPlayer.discards.splice(dIdx, 1);
+        }
+      } else if (kind === 'add') {
+        // Upgrade existing peng to gang
+        const meld = player.melds.find(m => m.type === 'peng' && m.tile === msg.tile);
+        if (meld) meld.type = 'gang';
+        if (uiSeat === 0) {
+          player.hand = Tiles.removeOne(player.hand, msg.tile);
+        } else {
+          const idx = player.hand.lastIndexOf('?');
+          if (idx >= 0) player.hand.splice(idx, 1);
+        }
+      }
+      Sound.gang();
+      UI.showActionPopup(kind === 'an' ? '暗杠' : '杠', uiSeat);
+    }
+
+    UI.renderAll();
+    UI.hideActions();
+  },
+
+  /**
+   * Build initial state when game starts (4 seats, rotated so I'm seat 0)
+   */
+  startGame(msg) {
+    this.active = true;
+    UI.showScreen('game-screen');
+    UI.setConnectionStatus(true);
+
+    const view = msg.gameView;
+    const serverPlayers = msg.players;
+
+    // Build state with seats rotated so "me" is uiSeat 0
+    const players = [0, 1, 2, 3].map(uiSeat => {
+      const serverSeat = this.toServerSeat(uiSeat);
+      const sp = serverPlayers.find(p => p.seat === serverSeat);
+      const vp = view.players.find(p => p.seat === serverSeat);
+      return {
+        index: uiSeat,
+        name: sp ? sp.name : `座位${uiSeat}`,
+        hand: uiSeat === 0 ? view.myHand : new Array(vp ? vp.handCount : 13).fill('?'),
+        melds: vp ? vp.melds : [],
+        discards: vp ? vp.discards : [],
+        missing: uiSeat === 0 ? view.myMissing : (vp ? vp.missing : null),
+        score: sp ? sp.score : 0,
+        hasHu: vp ? vp.hasHu : false,
+        huInfo: vp ? vp.huInfo : null,
+        isAI: sp ? sp.isAI : false,
+      };
+    });
+
+    this.state = {
+      players,
+      wall: new Array(view.wallCount).fill('?'),
+      currentTurn: this.toUiSeat(view.currentTurn),
+      lastDiscard: view.lastDiscard,
+      lastDiscardPlayer: view.lastDiscardPlayer >= 0 ? this.toUiSeat(view.lastDiscardPlayer) : -1,
+      phase: view.phase,
+      round: 1,
+      pendingActions: null,
+      difficulty: 'online',
+    };
+
+    // Expose to UI module which reads Game.state
+    Game.state = this.state;
+    Game.isOnline = true;
+
+    UI.renderAll();
+
+    if (view.phase === 'choosing-missing' && !view.myMissing) {
+      setTimeout(() => UI.showMissingOverlay(), 600);
+    }
+  },
+
+  /**
+   * Rebuild state from a full view snapshot (used after reconnect)
+   */
+  rebuildStateFromView(view, serverPlayers) {
+    this.startGame({ gameView: view, players: serverPlayers });
+  },
+
+  /**
+   * User clicked a tile to discard
+   */
+  onDiscard(tile) {
+    Online.discard(tile);
+  },
+
+  /**
+   * User clicked an action button
+   */
+  onAction(action) {
+    const pa = this.state.pendingActions;
+    if (!pa) return;
+    Sound.buttonClick();
+
+    if (action === 'pass') {
+      // If we were reacting to a discard, send pass to server
+      if (pa.fromPlayer !== undefined) {
+        Online.reaction('pass');
+      }
+      this.state.pendingActions = null;
+      UI.hideActions();
+      UI.hideHint();
+      return;
+    }
+
+    if (action === 'hu') {
+      if (pa.fromPlayer !== undefined) {
+        // Reacting to opponent's discard - send reaction
+        Online.reaction('hu');
+      } else if (pa.zimo) {
+        // Self-draw win - send dedicated zimo message
+        Online.zimo();
+      }
+      this.state.pendingActions = null;
+      UI.hideActions();
+      return;
+    }
+
+    if (action === 'peng') {
+      Online.reaction('peng');
+      this.state.pendingActions = null;
+      UI.hideActions();
+      return;
+    }
+
+    if (action === 'gang') {
+      if (pa.fromPlayer !== undefined) {
+        // Ming gang from discard
+        Online.reaction('gang');
+      } else if (pa.angangTiles && pa.angangTiles.length > 0) {
+        Online.anGang(pa.angangTiles[0]);
+      } else if (pa.addGangTiles && pa.addGangTiles.length > 0) {
+        Online.addGang(pa.addGangTiles[0]);
+      }
+      this.state.pendingActions = null;
+      UI.hideActions();
+      return;
+    }
+  },
+
+  /**
+   * User chose their missing suit
+   */
+  onChooseMissing(suit) {
+    Online.chooseMissing(suit);
+    this.state.players[0].missing = suit;
+    UI.hideMissingOverlay();
+    UI.toast(`你选择了缺${Tiles.getSuitName(suit)}`, 'success');
+    UI.renderAll();
+  },
+
+  /**
+   * Tile click handler (called from UI when in online mode)
+   */
+  onHandTileClick(tile) {
+    if (this.state.currentTurn !== 0) return;
+    const player = this.state.players[0];
+    if (player.hasHu) return;
+    if (player.hand.length % 3 !== 2) return;
+
+    const hasMissingTiles = player.hand.some(t => Tiles.suitOf(t) === player.missing);
+    if (hasMissingTiles && Tiles.suitOf(tile) !== player.missing) {
+      Sound.warning();
+      UI.toast(`必须先打出缺门（${Tiles.getSuitName(player.missing)}）的牌`, 'warning');
+      return;
+    }
+    this.onDiscard(tile);
+  },
+
+  translateError(code) {
+    const map = {
+      'room-not-found': '房间不存在',
+      'room-full': '房间已满',
+      'game-in-progress': '游戏正在进行中',
+      'not-host': '只有房主可操作',
+      'wrong-state': '当前状态不允许此操作',
+      'not-your-turn': '还没轮到你',
+      'must-discard-missing': '必须先打出缺一门的牌',
+      'tile-not-in-hand': '手牌中没有这张牌',
+      'invalid-suit': '无效的花色',
+      'missing-credentials': '缺少登录凭证',
+      'connection-timeout': '连接服务器超时',
+    };
+    return map[code] || code;
+  },
+};
+
+// ========== online-lobby.js ==========
+/* ============================================
+   ONLINE LOBBY UI
+   Manages: create room, join room, room waiting screen
+   ============================================ */
+
+const OnlineLobby = {
+
+  /**
+   * Show online entry (name input + create/join)
+   */
+  showEntry() {
+    Sound.buttonClick();
+    document.getElementById('online-entry').classList.add('active');
+    // Restore name from localStorage if available
+    const saved = localStorage.getItem('player-name');
+    if (saved) {
+      document.getElementById('player-name-input').value = saved;
+    }
+  },
+
+  hideEntry() {
+    document.getElementById('online-entry').classList.remove('active');
+  },
+
+  /**
+   * Connect to server and create a room
+   */
+  async createRoom() {
+    const name = (document.getElementById('player-name-input').value || '').trim() || '玩家';
+    localStorage.setItem('player-name', name);
+    Sound.buttonClick();
+
+    try {
+      UI.toast('连接服务器中...', 'info');
+      await Online.connect(null, name);
+      Online.createRoom({
+        rounds: 4,
+        difficulty: 'medium',
+        allowAiFill: true,
+      });
+    } catch (e) {
+      UI.toast('无法连接到服务器，请检查网络', 'error');
+      console.error(e);
+    }
+  },
+
+  /**
+   * Connect and join a room by code
+   */
+  async joinRoom() {
+    const name = (document.getElementById('player-name-input').value || '').trim() || '玩家';
+    const code = (document.getElementById('room-code-input').value || '').trim();
+    if (!/^\d{6}$/.test(code)) {
+      UI.toast('房间号必须是 6 位数字', 'warning');
+      return;
+    }
+    localStorage.setItem('player-name', name);
+    Sound.buttonClick();
+
+    try {
+      UI.toast('连接服务器中...', 'info');
+      await Online.connect(null, name);
+      Online.joinRoom(code);
+    } catch (e) {
+      UI.toast('无法连接到服务器，请检查网络', 'error');
+      console.error(e);
+    }
+  },
+
+  /**
+   * Called when we successfully joined a room
+   */
+  onRoomJoined(msg) {
+    this.hideEntry();
+    document.getElementById('room-waiting').classList.add('active');
+    this.updateRoomDisplay(msg);
+  },
+
+  onPlayerJoined(msg) {
+    UI.toast(`${msg.name} 加入了房间`, 'success');
+    this.updatePlayerList(msg.players);
+  },
+
+  onPlayerLeft(msg) {
+    UI.toast('一位玩家离开了房间', 'warning');
+    this.updatePlayerList(msg.players);
+  },
+
+  updateRoomDisplay(msg) {
+    document.getElementById('room-code-display').textContent = msg.code;
+    document.getElementById('host-controls').style.display = msg.isHost ? 'block' : 'none';
+    document.getElementById('guest-controls').style.display = msg.isHost ? 'none' : 'block';
+    this.updatePlayerList(msg.players);
+  },
+
+  updatePlayerList(players) {
+    const list = document.getElementById('room-player-list');
+    list.innerHTML = '';
+    const seatNames = ['南', '东', '北', '西'];
+
+    for (let uiSeat = 0; uiSeat < 4; uiSeat++) {
+      const serverSeat = OnlineGame.toServerSeat(uiSeat);
+      const player = players.find(p => p.seat === serverSeat);
+      const row = document.createElement('div');
+      row.className = 'room-seat';
+      if (player) {
+        row.classList.add('filled');
+        if (uiSeat === 0) row.classList.add('me');
+        row.innerHTML = `
+          <div class="seat-mark">${seatNames[uiSeat]}</div>
+          <div class="seat-name">${player.name}${uiSeat === 0 ? ' (你)' : ''}</div>
+          <div class="seat-status ${player.online ? 'online' : 'offline'}">
+            ${player.online ? '在线' : '离线'}
+          </div>
+        `;
+      } else {
+        row.innerHTML = `
+          <div class="seat-mark empty">${seatNames[uiSeat]}</div>
+          <div class="seat-name empty">等待加入...</div>
+          <div class="seat-status">空位</div>
+        `;
+      }
+      list.appendChild(row);
+    }
+  },
+
+  copyRoomCode() {
+    const code = document.getElementById('room-code-display').textContent;
+    Sound.buttonClick();
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(code).then(() => {
+        UI.toast('房间号已复制', 'success');
+      });
+    } else {
+      // Fallback: create textarea and select
+      const ta = document.createElement('textarea');
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      UI.toast('房间号已复制', 'success');
+    }
+  },
+
+  startGame() {
+    Sound.buttonClick();
+    Online.startGame();
+  },
+
+  leaveRoom() {
+    Sound.buttonClick();
+    Online.leaveRoom();
+    document.getElementById('room-waiting').classList.remove('active');
+    Online.disconnect();
+  },
+};
+</script></body></html>
